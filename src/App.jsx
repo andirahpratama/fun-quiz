@@ -193,6 +193,9 @@ export default function App() {
       answeredQuestionIds,
       onTargetHit: handleTargetHit,
       gameTimeLeft: timeLeft,
+      studentInfo,
+      subject: activeQuiz.subject,
+      material: activeQuiz.material,
     };
 
     switch (activeQuiz.game_type) {
@@ -234,21 +237,7 @@ export default function App() {
     }
 
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 p-4">
-        <div className="max-w-5xl mx-auto mb-4 flex items-center justify-between modern-glass p-4">
-          <div>
-            <span className="text-lg font-bold text-indigo-400">{activeQuiz.subject}</span>
-            <p className="text-xs text-slate-400">Siswa: {studentInfo.name} ({studentInfo.studentClass})</p>
-          </div>
-
-          <div className="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-xl border border-slate-800">
-            <Clock className="w-4 h-4 text-amber-400 animate-pulse" />
-            <span className="font-mono text-lg font-black text-amber-400">
-              {formatTimer(timeLeft)}
-            </span>
-          </div>
-        </div>
-
+      <div className="min-h-screen bg-slate-950 text-slate-100">
         {renderGameEngine()}
 
         <QuestionModal

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Volume2, VolumeX, Anchor, Send } from 'lucide-react';
+import { Volume2, VolumeX, Send } from 'lucide-react';
 
 // Cheerful Procedural Audio Engine (Zero External Audio Files Needed)
 class SoundEngine {
@@ -60,7 +60,6 @@ class SoundEngine {
       const noteIndex = melodyPattern[this.step % melodyPattern.length];
       const freq = notes[noteIndex % notes.length];
 
-      // Lead synth pluck
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = (this.step % 4 === 0) ? 'triangle' : 'sine';
@@ -75,7 +74,6 @@ class SoundEngine {
       osc.start(now);
       osc.stop(now + stepDuration * 1.4);
 
-      // Bass kick on beat
       if (this.step % 4 === 0) {
         const bassOsc = this.ctx.createOscillator();
         const bassGain = this.ctx.createGain();
@@ -94,7 +92,6 @@ class SoundEngine {
         bassOsc.stop(now + stepDuration * 1.8);
       }
 
-      // Percussive hat
       if (this.step % 2 === 1) {
         this.playNoiseHat(now);
       }
@@ -206,12 +203,16 @@ export default function FishingGame({
   questions,
   answeredQuestionIds,
   onTargetHit,
+  studentInfo,
+  subject,
+  material,
+  gameTimeLeft
 }) {
   const canvasRef = useRef(null);
   const soundRef = useRef(null);
 
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [toastMessage, setToastMessage] = useState('Pancingan Siap! Sentuh air untuk lempar kail 🎣');
+  const [toastMessage, setToastMessage] = useState('Pancingan Siap! Sentuh air laut untuk meluncurkan mata kail 🎣');
   const [isToastWarning, setIsToastWarning] = useState(false);
   const [showToast, setShowToast] = useState(true);
 
@@ -437,7 +438,7 @@ export default function FishingGame({
     let animationFrameId;
 
     const render = () => {
-      // 1. Update Physics
+      // Update Physics
       boat.swayTimer += 0.04;
       boat.swayOffset = Math.sin(boat.swayTimer) * 4;
       fishingRod.tipX = boat.x + 48;
@@ -549,18 +550,16 @@ export default function FishingGame({
         }
       });
 
-      // 2. Draw Graphics
+      // Draw Graphics
       ctx.clearRect(0, 0, canvasW, canvasH);
       const waterLine = 85;
 
-      // Sky Background
       const skyGrad = ctx.createLinearGradient(0, 0, 0, waterLine);
       skyGrad.addColorStop(0, '#7DD3FC');
       skyGrad.addColorStop(1, '#BAE6FD');
       ctx.fillStyle = skyGrad;
       ctx.fillRect(0, 0, canvasW, waterLine);
 
-      // Fluffy Clouds
       ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
       ctx.beginPath();
       ctx.arc(65, 30, 18, 0, Math.PI * 2);
@@ -568,7 +567,6 @@ export default function FishingGame({
       ctx.arc(115, 30, 18, 0, Math.PI * 2);
       ctx.fill();
 
-      // Deep Sea Gradient
       const seaGrad = ctx.createLinearGradient(0, waterLine, 0, canvasH);
       seaGrad.addColorStop(0, '#0284C7');
       seaGrad.addColorStop(0.3, '#0369A1');
@@ -577,7 +575,6 @@ export default function FishingGame({
       ctx.fillStyle = seaGrad;
       ctx.fillRect(0, waterLine, canvasW, canvasH - waterLine);
 
-      // Water Ripple
       ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
       ctx.beginPath();
       for (let wx = 0; wx <= canvasW; wx += 20) {
@@ -590,7 +587,6 @@ export default function FishingGame({
       ctx.closePath();
       ctx.fill();
 
-      // Sunbeams
       ctx.save();
       ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
       for (let r = 0; r < 5; r++) {
@@ -604,7 +600,6 @@ export default function FishingGame({
       }
       ctx.restore();
 
-      // Bubbles
       ambientBubbles.forEach(b => {
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
@@ -615,7 +610,6 @@ export default function FishingGame({
         ctx.stroke();
       });
 
-      // Seaweed
       ctx.fillStyle = '#065F46';
       for (let sw = 0; sw < canvasW; sw += 45) {
         ctx.beginPath();
@@ -624,7 +618,6 @@ export default function FishingGame({
         ctx.fill();
       }
 
-      // Draw Fishes
       fishes.forEach(fish => {
         if (fish.answered) return;
 
@@ -706,7 +699,6 @@ export default function FishingGame({
         ctx.restore();
       });
 
-      // Fishing Line & Hook
       if (hook.active) {
         ctx.save();
         ctx.beginPath();
@@ -732,7 +724,6 @@ export default function FishingGame({
         ctx.restore();
       }
 
-      // Wooden Boat & Fisherman Character
       const boatY = boat.y + boat.swayOffset;
       ctx.save();
       ctx.translate(boat.x, boatY);
@@ -817,68 +808,103 @@ export default function FishingGame({
   };
 
   const remainingQuestionsCount = questions.length - answeredQuestionIds.length;
+  const currentScore = Math.round((answeredQuestionIds.length / questions.length) * 100);
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col bg-slate-900 rounded-3xl overflow-hidden border-4 border-yellow-400 shadow-2xl">
+    <div className="w-full max-w-5xl mx-auto flex flex-col min-h-screen bg-slate-900 text-white font-['Fredoka','Nunito',sans-serif]">
       
-      {/* Top Header Controls Bar */}
-      <div className="w-full bg-blue-950/90 backdrop-blur px-4 py-2.5 flex items-center justify-between text-xs sm:text-sm font-bold border-b border-yellow-400/30 z-20">
-        <div className="flex items-center gap-2 text-cyan-200">
-          <span>Target Ikan Soal Tersisa:</span>
-          <span className="bg-yellow-400 text-blue-950 px-2.5 py-0.5 rounded-full font-black text-sm">
-            {remainingQuestionsCount}
-          </span>
-        </div>
-
-        <div className="hidden sm:block text-yellow-300 font-bold animate-pulse text-xs">
-          🎯 Sentuh air laut untuk pancing ikan bernomor soal!
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={toggleSound}
-            className="w-9 h-9 rounded-full bg-blue-700 hover:bg-blue-600 border-2 border-yellow-300 flex items-center justify-center text-white text-sm shadow transition"
-            title="Nyalakan/Matikan Suara"
-          >
-            {soundEnabled ? <Volume2 className="w-5 h-5 text-yellow-300" /> : <VolumeX className="w-5 h-5 text-rose-300" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Main Canvas Area */}
-      <div className="relative w-full h-[480px] sm:h-[540px] cursor-crosshair overflow-hidden bg-sky-900">
-        <canvas ref={canvasRef} className="w-full h-full block" />
-
-        {/* Toast Notification Banner */}
-        {showToast && (
-          <div className={`absolute top-16 inset-x-0 mx-auto w-max max-w-[90%] px-4 py-2 rounded-2xl border-2 shadow-2xl pointer-events-none transition-opacity duration-300 z-30 font-extrabold text-center text-xs sm:text-sm ${
-            isToastWarning ? 'bg-amber-950/95 text-yellow-300 border-yellow-400' : 'bg-blue-950/95 text-cyan-300 border-sky-400'
-          }`}>
-            {toastMessage}
+      {/* Top Header matching HTML exact style */}
+      <header className="w-full bg-blue-900/90 backdrop-blur border-b-4 border-yellow-400 py-2.5 px-4 sticky top-0 z-40 shadow-lg">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-yellow-400 to-amber-300 flex items-center justify-center text-2xl shadow-inner border-2 border-white">
+              🎣
+            </div>
+            <div>
+              <h1 className="text-base sm:text-xl font-bold tracking-wide text-yellow-300 leading-tight uppercase">
+                {subject || 'PANCASILA FISHING QUEST'}
+              </h1>
+              <p className="text-xs text-blue-200 font-semibold tracking-wider">
+                Materi: {material || 'Tata Urutan Perundang-undangan'}
+              </p>
+            </div>
           </div>
-        )}
-      </div>
+          
+          {/* Live Stats & Audio Controls */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {studentInfo && (
+              <div className="hidden sm:flex items-center bg-blue-950/70 px-3 py-1 rounded-full border border-blue-400/40 text-xs text-cyan-200">
+                👤 <span className="ml-1 font-bold text-white max-w-[120px] truncate">{studentInfo.name}</span>
+                <span className="ml-1 bg-yellow-400 text-blue-900 px-1.5 py-0.2 rounded font-black text-[10px]">{studentInfo.studentClass}</span>
+              </div>
+            )}
 
-      {/* Floating Controller at Bottom */}
-      <div className="w-full bg-blue-950/95 backdrop-blur py-3 px-4 flex items-center justify-between border-t-2 border-yellow-400/40 z-20">
-        <div className="text-xs text-sky-200 flex items-center gap-1.5 font-bold">
-          <span>🚣 Nelayan di Atas Perahu</span>
+            <button
+              onClick={toggleSound}
+              className="w-9 h-9 rounded-full bg-blue-700 hover:bg-blue-600 border-2 border-yellow-300 flex items-center justify-center text-sm shadow transition"
+              title="Nyalakan/Matikan Suara"
+            >
+              {soundEnabled ? '🔊' : '🔇'}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Game Screen Container */}
+      <section className="flex-1 w-full max-w-4xl mx-auto my-3 h-[75vh] min-h-[500px] max-h-[720px] relative bg-gradient-to-b from-sky-400 via-blue-600 to-blue-950 rounded-3xl overflow-hidden border-4 border-yellow-400 shadow-2xl flex flex-col">
+        
+        {/* Upper Status Bar */}
+        <div className="w-full bg-blue-950/70 backdrop-blur px-4 py-2 flex items-center justify-between text-xs sm:text-sm font-bold border-b border-blue-400/30 z-20">
+          <div className="flex items-center space-x-2 text-cyan-200">
+            <span>Target Ikan Soal Tersisa:</span>
+            <span className="bg-yellow-400 text-blue-950 px-2.5 py-0.5 rounded-full font-black text-sm">
+              {remainingQuestionsCount}
+            </span>
+          </div>
+          <div className="text-yellow-300 animate-pulse hidden sm:block text-xs">
+            🎯 Tangkap ikan bernomor (1-{questions.length})!
+          </div>
+          <div className="text-right text-emerald-300 font-black">
+            Soal Terjawab: {answeredQuestionIds.length}/{questions.length}
+          </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleQuickLaunch}
-          className="px-5 py-2.5 rounded-xl btn-3d btn-3d-cyan text-white text-xs font-black uppercase flex items-center gap-2"
-        >
-          <Send className="w-4 h-4" />
-          <span>Lempar Kail 🎣</span>
-        </button>
+        {/* Main Canvas */}
+        <div className="relative flex-1 w-full h-full cursor-crosshair overflow-hidden">
+          <canvas ref={canvasRef} className="w-full h-full block" />
 
-        <div className="text-xs text-yellow-300 font-extrabold">
-          Soal Terjawab: {answeredQuestionIds.length}/{questions.length}
+          {/* Toast Message */}
+          {showToast && (
+            <div className={`absolute top-16 inset-x-0 mx-auto w-max max-w-[90%] px-4 py-2 rounded-2xl border-2 shadow-2xl pointer-events-none transition-opacity duration-300 z-30 font-bold text-center text-xs sm:text-sm ${
+              isToastWarning ? 'bg-amber-950/95 text-yellow-300 border-yellow-400' : 'bg-blue-950/95 text-cyan-300 border-sky-400'
+            }`}>
+              {toastMessage}
+            </div>
+          )}
+
+          {/* Tap Instruction Hint */}
+          <div className="absolute bottom-16 inset-x-0 mx-auto w-max bg-blue-950/80 text-yellow-300 text-xs px-4 py-1.5 rounded-full border border-yellow-400/60 pointer-events-none transition-opacity duration-500">
+            🎯 Sentuh / Klik ke arah air laut untuk meluncurkan kail ke bawah!
+          </div>
         </div>
-      </div>
+
+        {/* Floating Reel Controller at Bottom */}
+        <div className="w-full bg-blue-950/85 backdrop-blur py-2.5 px-4 flex items-center justify-between border-t-2 border-yellow-400/40 z-20">
+          <div className="text-xs text-sky-200 flex items-center space-x-1.5">
+            <span>🚣 Nelayan di Atas Perahu</span>
+          </div>
+          <button
+            onClick={handleQuickLaunch}
+            className="px-5 py-2 rounded-xl btn-3d btn-3d-cyan text-white text-xs font-black uppercase flex items-center space-x-1"
+          >
+            <span>Lempar Kail 🎣</span>
+          </button>
+          <div className="text-xs text-yellow-300 font-bold">
+            Target Soal: {questions.length}
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

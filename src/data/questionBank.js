@@ -48,34 +48,114 @@ export const GAME_TYPES = [
 export const QUESTION_TEMPLATES = {
   'PKN': [
     {
-      question: 'Pancasila disahkan secara resmi sebagai dasar negara Indonesia pada tanggal...',
-      options: ['1 Juni 1945', '17 Agustus 1945', '18 Agustus 1945', '22 Juni 1945'],
-      correctAnswer: 2,
-      explanation: 'Pancasila disahkan sebagai dasar negara oleh PPKI pada tanggal 18 Agustus 1945 bersamaan dengan pengesahan UUD 1945.'
-    },
-    {
-      question: 'Sikap saling menghormati antar pemeluk agama yang berbeda merupakan pengamalan Pancasila sila ke-...',
-      options: ['Sila Ke-1', 'Sila Ke-2', 'Sila Ke-3', 'Sila Ke-5'],
-      correctAnswer: 0,
-      explanation: 'Sila Ke-1 (Ketuhanan Yang Maha Esa) mengajarkan toleransi, saling menghormati, dan kebebasan menjalankan ibadah sesuai kepercayaan masing-masing.'
-    },
-    {
-      question: 'Lembaga negara yang berwenang mengubah dan menetapkan UUD menurut UUD 1945 adalah...',
-      options: ['DPR', 'Presiden', 'MPR', 'Mahkamah Konstitusi'],
-      correctAnswer: 2,
-      explanation: 'Berdasarkan Pasal 3 ayat 1 UUD 1945, Majelis Permusyawaratan Rakyat (MPR) berwenang mengubah dan menetapkan Undang-Undang Dasar.'
-    },
-    {
-      question: 'Bentuk negara Indonesia adalah Negara Kesatuan yang berbentuk Republik, tertuang dalam UUD 1945 Pasal...',
-      options: ['Pasal 1 Ayat (1)', 'Pasal 1 Ayat (2)', 'Pasal 2 Ayat (1)', 'Pasal 3 Ayat (1)'],
-      correctAnswer: 0,
-      explanation: 'Pasal 1 Ayat (1) UUD 1945 berbunyi: "Negara Indonesia ialah Negara Kesatuan, yang berbentuk Republik."'
-    },
-    {
-      question: 'Landasan hukum pelaksanaan otonomi daerah di Indonesia diatur dalam UUD 1945 pasal...',
-      options: ['Pasal 17', 'Pasal 18', 'Pasal 27', 'Pasal 30'],
+      question: "Berdasarkan Pasal 7 ayat (1) UU No. 12 Tahun 2011, peraturan perundang-undangan yang menempati posisi tertinggi dalam tata urutan perundang-undangan di Indonesia adalah...",
+      options: [
+        "Ketetapan MPR (TAP MPR)",
+        "Undang-Undang Dasar Negara Republik Indonesia Tahun 1945",
+        "Undang-Undang / Peraturan Pemerintah Pengganti UU",
+        "Peraturan Presiden (Perpres)"
+      ],
       correctAnswer: 1,
-      explanation: 'Pasal 18 UUD 1945 mengatur tentang Pembagian Wilayah Negara Indonesia dan Pemerintahan Daerah (Otonomi Daerah).'
+      explanation: "UUD NRI Tahun 1945 merupakan hukum dasar tertinggi dalam hierarki peraturan perundang-undangan di Indonesia yang menjadi pedoman norma bagi seluruh peraturan di bawahnya."
+    },
+    {
+      question: "Peraturan perundang-undangan yang ditetapkan oleh Presiden dalam hal 'ikhwal kegentingan yang memaksa' disebut...",
+      options: [
+        "Peraturan Pemerintah (PP)",
+        "Peraturan Presiden (Perpres)",
+        "Peraturan Pemerintah Pengganti Undang-Undang (Perppu)",
+        "Ketetapan MPR"
+      ],
+      correctAnswer: 2,
+      explanation: "Perppu dibuat Presiden dalam situasi kegentingan memaksa dan memiliki kedudukan setingkat dengan Undang-Undang, namun wajib memperoleh persetujuan DPR pada masa sidang berikutnya."
+    },
+    {
+      question: "Asas hukum yang menyatakan bahwa 'peraturan perundang-undangan yang lebih tinggi mengesampingkan atau membatalkan peraturan yang lebih rendah' adalah...",
+      options: [
+        "Lex superior derogat legi inferiori",
+        "Lex posterior derogat legi priori",
+        "Lex specialis derogat legi generali",
+        "Equality before the law"
+      ],
+      correctAnswer: 0,
+      explanation: "Asas 'Lex superior derogat legi inferiori' menegaskan bahwa aturan hukum yang lebih rendah tidak boleh bertentangan dengan norma hukum yang lebih tinggi tingkatannya."
+    },
+    {
+      question: "Lembaga negara yang memiliki wewenang untuk menguji materi Undang-Undang terhadap UUD NRI Tahun 1945 adalah...",
+      options: [
+        "Mahkamah Agung (MA)",
+        "Dewan Perwakilan Rakyat (DPR)",
+        "Mahkamah Konstitusi (MK)",
+        "Komisi Yudisial (KY)"
+      ],
+      correctAnswer: 2,
+      explanation: "Mahkamah Konstitusi (MK) berwenang menguji materi Undang-Undang terhadap UUD 1945, sedangkan Mahkamah Agung (MA) berwenang menguji peraturan di bawah UU terhadap UU."
+    },
+    {
+      question: "Peraturan Pemerintah (PP) dibentuk oleh Presiden dengan tujuan utama untuk...",
+      options: [
+        "Menetapkan anggaran belanja negara secara mandiri",
+        "Menjalankan Undang-Undang sebagaimana mestinya",
+        "Mengubah klausul pasal dalam UUD NRI Tahun 1945",
+        "Membubarkan institusi lembaga pemerintah daerah"
+      ],
+      correctAnswer: 1,
+      explanation: "Sesuai Pasal 5 ayat (2) UUD NRI Tahun 1945, Presiden menetapkan Peraturan Pemerintah untuk menjalankan Undang-Undang sebagaimana mestinya."
+    },
+    {
+      question: "Peraturan Daerah (Perda) Kabupaten/Kota dirancang dan ditetapkan atas dasar persetujuan bersama antara...",
+      options: [
+        "Bupati/Walikota bersama DPRD Kabupaten/Kota",
+        "Gubernur bersama Bupati/Walikota",
+        "Presiden bersama Menteri Dalam Negeri",
+        "Kepala Desa bersama Camat wilayah setempat"
+      ],
+      correctAnswer: 0,
+      explanation: "Perda Kabupaten/Kota dibentuk oleh Bupati atau Walikota dengan persetujuan bersama Dewan Perwakilan Rakyat Daerah (DPRD) Kabupaten/Kota."
+    },
+    {
+      question: "Manakah urutan hierarki yang BENAR menurut UU No. 12 Tahun 2011 dari urutan paling tinggi ke paling rendah?",
+      options: [
+        "UUD 1945 -> PP -> Perpres -> UU -> Perda Provinsi",
+        "UUD 1945 -> TAP MPR -> UU/Perppu -> PP -> Perpres -> Perda Provinsi -> Perda Kab/Kota",
+        "TAP MPR -> UUD 1945 -> PP -> UU -> Perda Kab/Kota",
+        "UUD 1945 -> UU -> TAP MPR -> Perpres -> PP -> Perda Provinsi"
+      ],
+      correctAnswer: 1,
+      explanation: "Hierarki Pasal 7 UU 12/2011: 1. UUD 1945, 2. TAP MPR, 3. UU/Perppu, 4. Peraturan Pemerintah, 5. Peraturan Presiden, 6. Perda Provinsi, 7. Perda Kab/Kota."
+    },
+    {
+      question: "Tiga landasan pokok yang wajib dipenuhi dalam setiap perumusan peraturan perundang-undangan di Indonesia adalah...",
+      options: [
+        "Landasan Militer, Politik, dan Ekonomi",
+        "Landasan Filosofis, Sosiologis, dan Yuridis",
+        "Landasan Tradisional, Internasional, dan Regional",
+        "Landasan Moneter, Birokrasi, dan Eksekutif"
+      ],
+      correctAnswer: 1,
+      explanation: "Pembentukan perundang-undangan harus bersumber pada cita hukum/Pancasila (Filosofis), kesesuaian kebutuhan masyarakat (Sosiologis), dan keabsahan dasar hukum (Yuridis)."
+    },
+    {
+      question: "Apabila materi suatu Peraturan Daerah (Perda) dinilai bertentangan dengan Undang-Undang, lembaga yang berwenang menguji dan membatalkannya adalah...",
+      options: [
+        "Mahkamah Agung (MA)",
+        "Mahkamah Konstitusi (MK)",
+        "Badan Pemeriksa Keuangan (BPK)",
+        "Komisi Pemberantasan Korupsi (KPK)"
+      ],
+      correctAnswer: 0,
+      explanation: "Berdasarkan Pasal 24A UUD 1945, Mahkamah Agung (MA) berwenang menguji peraturan perundang-undangan di bawah undang-undang terhadap undang-undang."
+    },
+    {
+      question: "Contoh sikap ketaatan dan kepatuhan siswa terhadap peraturan tata tertib di lingkungan sekolah adalah...",
+      options: [
+        "Mengendarai sepeda motor ke sekolah sebelum memiliki SIM",
+        "Mematuhi tata tertib sekolah dan mengenakan seragam dengan rapi",
+        "Menyebarkan informasi hoax yang belum terverifikasi di media sosial",
+        "Meninggalkan jam pelajaran tanpa izin saat guru sedang berhalangan"
+      ],
+      correctAnswer: 1,
+      explanation: "Mematuhi tata tertib sekolah dan menggunakan seragam sesuai ketentuan merupakan wujud kesadaran hukum dan disiplin positif sejak dini."
     }
   ],
 
