@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { User, School, Sparkles, Volume2, ShieldCheck, Gamepad2, Rocket, HelpCircle } from 'lucide-react';
 import { GAME_TYPES } from '../data/questionBank';
 
 export default function StudentPlayModal({ quiz, onStartGame }) {
@@ -15,7 +16,7 @@ export default function StudentPlayModal({ quiz, onStartGame }) {
       case 'balloon': return '🎯';
       case 'catch_ball': return '🏀';
       case 'fruit_ninja': return '⚔️';
-      default: return '🎣';
+      default: return '🎮';
     }
   };
 
@@ -26,24 +27,24 @@ export default function StudentPlayModal({ quiz, onStartGame }) {
 
   const getActionText = () => {
     switch (quiz.game_type) {
-      case 'fishing': return 'MULAI MEMANCING';
-      case 'balloon': return 'MULAI MEMANAH';
+      case 'fishing': return 'MULAI MEMANCING NOW';
+      case 'balloon': return 'MULAI MEMANAH NOW';
       case 'catch_ball': return 'MULAI TANGKAP BOLA';
-      case 'fruit_ninja': return 'MULAI MEMOTONG';
-      default: return 'MULAI BERMAIN';
+      case 'fruit_ninja': return 'MULAI MEMOTONG NOW';
+      default: return 'MULAI BERMAIN GAME';
     }
   };
 
   const getGameDescription = () => {
     switch (quiz.game_type) {
       case 'fishing':
-        return 'Nelayan di perahu siap melemparkan kail ke dalam laut! Arahkan kailmu ke ikan bernomor soal (1-10) yang berenang zigzag dan hindari ikan hias liar!';
+        return 'Nelayan siap melemparkan kail! Arahkan kail ke ikan bernomor soal (1-10) yang berenang di lautan untuk membuka pertanyaan kuis!';
       case 'balloon':
-        return 'Balon bernomor soal melayang di udara! Bidik dan panah balon bernomor (1-10) untuk membuka pertanyaan!';
+        return 'Balon-balon bernomor soal melayang di udara! Bidik dan panah balon bernomor (1-10) untuk menjawab pertanyaan!';
       case 'catch_ball':
-        return 'Bola-bola bernomor soal jatuh dari atas langit! Geser keranjang untuk menangkap bola bernomor (1-10)!';
+        return 'Bola-bola bernomor soal jatuh dari langit! Geser keranjang basket kamu untuk menangkap bola bernomor (1-10)!';
       case 'fruit_ninja':
-        return 'Buah-buahan bernomor soal terlempar ke udara! Usap pedang ninja kamu untuk memotong buah bernomor (1-10)!';
+        return 'Buah-buahan bernomor soal terlempar ke udara! Tebas buah bernomor (1-10) dengan pedang ninja kamu!';
       default:
         return 'Jawab seluruh pertanyaan kuis dengan seru sambil bermain game interaktif!';
     }
@@ -62,119 +63,127 @@ export default function StudentPlayModal({ quiz, onStartGame }) {
   };
 
   return (
-    <div className="bg-slate-900 text-white min-h-screen flex flex-col justify-between overflow-x-hidden select-none font-['Fredoka','Nunito',sans-serif]">
+    <div className="relative min-h-screen flex flex-col justify-between overflow-x-hidden bg-[#030712] text-white select-none">
+      
+      {/* Background Ambient Lighting Blobs */}
+      <div className="ambient-bg">
+        <div className="ambient-blob-1" />
+        <div className="ambient-blob-2" />
+        <div className="ambient-blob-3" />
+      </div>
 
-      {/* Top Navigation / Status Bar matching Image 2 */}
-      <header className="w-full bg-blue-900/80 backdrop-blur border-b-4 border-yellow-400 py-2.5 px-4 sticky top-0 z-40 shadow-lg">
+      {/* Top Header / Status Bar */}
+      <header className="glass-nav py-3.5 px-4 sticky top-0 z-40 shadow-xl">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-yellow-400 to-amber-300 flex items-center justify-center text-2xl shadow-inner border-2 border-white shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-300 text-slate-950 flex items-center justify-center text-2xl shadow-lg shadow-amber-500/20 shrink-0 font-black">
               {getGameIcon()}
             </div>
             <div>
-              <h1 className="text-lg md:text-xl font-bold tracking-wide text-yellow-300 leading-tight uppercase">
+              <h1 className="text-base sm:text-lg font-black tracking-wider text-amber-300 uppercase leading-none">
                 {getGameTitle()}
               </h1>
-              <p className="text-xs text-blue-200 font-semibold tracking-wider">
-                {quiz.subject} &bull; {quiz.material}
+              <p className="text-xs text-slate-300 font-bold mt-1">
+                {quiz.subject} &bull; <span className="text-cyan-300">{quiz.material}</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <div className="hidden sm:flex items-center bg-blue-950/70 px-3 py-1 rounded-full border border-blue-400/40 text-xs text-cyan-200">
-              <span className="mr-1">👤</span>
-              <span className="font-bold text-white max-w-[120px] truncate">Siswa</span>
-              <span className="ml-1 bg-yellow-400 text-blue-900 px-1.5 py-0.2 rounded font-black text-[10px]">8H</span>
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-xs text-slate-300 font-bold">
+              <span>👤</span>
+              <span>Lobby Siswa SMP</span>
             </div>
-            <div className="flex items-center bg-yellow-500 text-blue-950 px-3 py-1 rounded-full font-black text-sm shadow-md border-2 border-white">
-              ⭐ <span className="ml-1 text-base">0</span>
-            </div>
-            <div className="w-9 h-9 rounded-full bg-blue-700 border-2 border-yellow-300 flex items-center justify-center text-sm shadow">
-              🔊
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-xs font-black">
+              <Volume2 className="w-4 h-4 text-amber-400 animate-pulse" />
+              <span>Audio Active</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Screen Container matching Image 2 */}
-      <main className="flex-1 relative flex flex-col items-center justify-center w-full p-4 overflow-hidden my-auto">
-        <section className="w-full max-w-md bg-gradient-to-b from-blue-600 via-sky-600 to-cyan-700 rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-yellow-400 relative z-20 text-center my-auto animate-fadeIn">
+      {/* Main Form Lobby Card Container */}
+      <main className="flex-1 relative z-10 flex flex-col items-center justify-center p-4 my-auto">
+        <div className="w-full max-w-lg glass-card p-6 sm:p-10 text-center animate-fadeIn relative overflow-hidden border-amber-400/30">
           
-          {/* Decorative Badge */}
-          <div className="inline-block bg-yellow-400 text-blue-950 font-black px-4 py-1.5 rounded-full text-xs uppercase tracking-widest mb-3 shadow-md">
-            🌟 UJI PEMAHAMAN {quiz.subject.toUpperCase()} SMP 🌟
+          {/* Top Decorative Game Tag */}
+          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/40 text-amber-300 font-extrabold px-4 py-1.5 rounded-full text-xs uppercase tracking-widest mb-4 shadow-inner">
+            <Sparkles className="w-3.5 h-3.5" />
+            GAME KUIS EDUKASI {quiz.subject.toUpperCase()} SMP
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-black text-white drop-shadow-[0_3px_5px_rgba(0,0,0,0.5)] mb-2 uppercase">
-            AYO MEMANCING!
+          <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight mb-2 drop-shadow-md">
+            SIAP BERMAIN & BELAJAR?
           </h2>
 
-          <p className="text-sky-100 text-sm mb-5 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
             {getGameDescription()}
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4 text-left">
+          {/* Student Entrance Form */}
+          <form onSubmit={handleSubmit} className="space-y-5 text-left">
             <div>
-              <label className="block text-xs font-bold text-yellow-300 uppercase tracking-wider mb-1 ml-1">
+              <label className="block text-[11px] font-black text-amber-300 uppercase tracking-widest mb-1.5 ml-1">
                 NAMA LENGKAP SISWA
               </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-lg pointer-events-none text-sky-300">👤</span>
+              <div className="input-wrapper-cyber">
+                <User className="input-icon-cyber text-amber-400" />
                 <input
                   type="text"
                   required
-                  placeholder="Riska Puspita"
+                  placeholder="Contoh: Riska Puspita"
                   value={studentName}
                   onChange={(e) => setStudentName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/90 focus:bg-white text-blue-950 font-bold placeholder-slate-400/60 rounded-2xl border-2 border-yellow-400 focus:outline-none focus:ring-4 focus:ring-yellow-300 shadow-inner text-sm transition"
+                  className="form-input-cyber text-white font-bold"
                 />
               </div>
-              <span className="text-[11px] text-sky-200/80 italic ml-1 mt-0.5 block font-light">Contoh: Riska Puspita</span>
+              <span className="text-[10px] text-slate-400 italic ml-1 mt-1 block">
+                *Masukkan nama lengkap agar tercantum di Sertifikat Kelulusan
+              </span>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-yellow-300 uppercase tracking-wider mb-1 ml-1">
-                KELAS
+              <label className="block text-[11px] font-black text-amber-300 uppercase tracking-widest mb-1.5 ml-1">
+                KELAS SISWA
               </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-lg pointer-events-none text-sky-300">🏫</span>
+              <div className="input-wrapper-cyber">
+                <School className="input-icon-cyber text-amber-400" />
                 <input
                   type="text"
                   required
-                  placeholder="8H"
+                  placeholder="Contoh: 8H / 7A / 9C"
                   value={studentClass}
                   onChange={(e) => setStudentClass(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/90 focus:bg-white text-blue-950 font-bold placeholder-slate-400/60 rounded-2xl border-2 border-yellow-400 focus:outline-none focus:ring-4 focus:ring-yellow-300 shadow-inner text-sm transition"
+                  className="form-input-cyber text-white font-bold"
                 />
               </div>
-              <span className="text-[11px] text-sky-200/80 italic ml-1 mt-0.5 block font-light">Contoh: 8H</span>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-4 rounded-2xl btn-3d btn-3d-yellow text-blue-950 font-black text-xl tracking-wider uppercase flex items-center justify-center space-x-2 border-2 border-white shadow-xl cursor-pointer"
+                className="w-full py-4 rounded-2xl btn-amber-glow text-slate-950 font-black text-lg sm:text-xl tracking-wider uppercase flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
               >
                 <span>{getActionText()}</span>
-                <span className="text-2xl">🚀</span>
+                <Rocket className="w-6 h-6 fill-current animate-bounce" />
               </button>
             </div>
           </form>
 
-          {/* Music Info Note */}
-          <div className="mt-5 text-[11px] text-cyan-200/90 bg-blue-950/50 py-2 px-3 rounded-xl border border-sky-300/30 flex items-center justify-center space-x-1.5">
-            <span>🎵</span>
-            <span>Musik ceria & efek Web Audio langsung berbunyi otomatis!</span>
+          {/* Audio & Game Tips */}
+          <div className="mt-6 text-[11px] text-slate-400 bg-slate-900/80 p-3 rounded-2xl border border-slate-800 flex items-center justify-center gap-2">
+            <Gamepad2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>Game ini menggunakan Web Audio API interaktif!</span>
           </div>
 
-        </section>
+        </div>
       </main>
 
-      {/* Footer matching Image 2 */}
-      <footer className="w-full bg-blue-950 py-2.5 text-center text-xs text-sky-400 border-t border-sky-800">
-        {quiz.subject} Kelas 8 SMP &bull; Materi {quiz.material}
+      {/* Bottom Footer */}
+      <footer className="w-full glass-nav py-3 text-center text-xs text-slate-400 border-t border-slate-800">
+        Kuis {quiz.subject} Kelas SMP &bull; Materi {quiz.material} &bull; Fun Quiz Platform
       </footer>
+
     </div>
   );
 }

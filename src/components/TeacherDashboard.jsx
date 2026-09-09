@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   PlusCircle, BookOpen, Trophy, Copy, Check, Share2, Play, Trash2, 
-  Download, Clock, Layers, Sparkles, HelpCircle, ChevronRight, CheckCircle2, ExternalLink, Gamepad2 
+  Download, Clock, Layers, Sparkles, HelpCircle, ChevronRight, CheckCircle2, ExternalLink, Gamepad2, Users, Award, AlertCircle
 } from 'lucide-react';
 import { SUBJECTS, GAME_TYPES, generateQuestions } from '../data/questionBank';
 import { api } from '../lib/supabase';
@@ -121,355 +121,394 @@ export default function TeacherDashboard({
     setTimeout(() => setCopiedLink(false), 2500);
   };
 
-  const handleOpenGameInNewTab = (quiz) => {
-    const url = getQuizShareUrl(quiz);
-    window.open(url, '_blank');
-  };
-
   const handleDeleteQuiz = async (quizId) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus kuis ini?')) return;
+    if (!window.confirm('Apakah Anda yakin ingin menghapus kuis ini?')) return;
     try {
-      await api.deleteQuiz(quizId, user.id);
+      await api.deleteQuiz(quizId);
       await loadUserData();
-    } catch (err) {
-      alert('Gagal menghapus kuis: ' + err.message);
+    } catch (e) {
+      alert('Gagal menghapus kuis');
     }
   };
 
-  const handleExportPDF = () => {
-    const filteredResults = filterQuizId === 'ALL'
-      ? teacherResults
-      : teacherResults.filter(r => r.quiz_id === filterQuizId);
+  // Stats calculation
+  const totalQuizzes = myQuizzes.length;
+  const totalSubmissions = teacherResults.length;
+  const avgScore = totalSubmissions > 0
+    ? Math.round(teacherResults.reduce((acc, r) => acc + (r.score || 0), 0) / totalSubmissions)
+    : 0;
 
-    if (filteredResults.length === 0) {
-      alert('Belum ada data nilai siswa untuk diunduh!');
-      return;
-    }
-
-    const targetQuiz = myQuizzes.find(q => q.id === filterQuizId);
-    exportTeacherResultsPDF(filteredResults, targetQuiz, user.name);
-  };
+  const currentSubjectData = SUBJECTS.find(s => s.id === subject) || SUBJECTS[0];
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fadeIn">
       
-      {/* 1. Welcome Banner Card (Neraca UMKM Dashboard Style) */}
-      <div className="welcome-banner flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div>
-          <p className="text-xs font-semibold text-emerald-200">
-            Selamat Datang 🌤️,
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-yellow-400 mt-1">
-            {user?.name || 'Guru SMP'}!
-          </h2>
-          <p className="text-xs text-emerald-100 font-medium mt-2">
-            {currentDateStr}
-          </p>
-        </div>
-
-        {/* Right Metric Summary Cards */}
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          <div className="banner-stat-card flex-1 md:flex-initial">
-            <span className="text-[10px] uppercase font-black tracking-wider text-emerald-200 block">
-              TOTAL KUIS DIBUAT
-            </span>
-            <div className="text-2xl font-black text-white mt-1">
-              {myQuizzes.length} <span className="text-xs font-normal opacity-80">Kuis</span>
+      {/* Welcome Hero Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 p-6 sm:p-8 border border-emerald-500/20 shadow-2xl mb-8">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold mb-3">
+              <Sparkles className="w-3.5 h-3.5" />
+              {currentDateStr}
             </div>
+            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+              Selamat Datang, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200">{user?.name || 'Guru SMP'}</span> 👋
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 font-medium mt-1 max-w-xl">
+              Buat kuis game edukasi SMP interaktif, bagikan kode/link ke siswa, dan lihat rekap nilai & sertifikat secara otomatis.
+            </p>
           </div>
 
-          <div className="banner-stat-card flex-1 md:flex-initial">
-            <span className="text-[10px] uppercase font-black tracking-wider text-emerald-200 block">
-              SISWA MENGERJAKAN
-            </span>
-            <div className="text-2xl font-black text-[#10b981] mt-1">
-              {teacherResults.length} <span className="text-xs font-normal opacity-80">Siswa</span>
+          {/* Quick Stat Widgets */}
+          <div className="grid grid-cols-3 gap-3 shrink-0">
+            <div className="glass-card p-3.5 text-center min-w-[100px]">
+              <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Kuis</p>
+              <p className="text-2xl font-black text-emerald-400 mt-0.5">{totalQuizzes}</p>
+            </div>
+            <div className="glass-card p-3.5 text-center min-w-[100px]">
+              <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Siswa</p>
+              <p className="text-2xl font-black text-cyan-400 mt-0.5">{totalSubmissions}</p>
+            </div>
+            <div className="glass-card p-3.5 text-center min-w-[100px]">
+              <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Rerata</p>
+              <p className="text-2xl font-black text-amber-400 mt-0.5">{avgScore}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tab 1: Create Quiz Form */}
+      {/* Main Tab Content */}
       {activeTab === 'create' && (
-        <div className="animate-fadeIn">
+        <div className="space-y-8 animate-fadeIn">
           
-          <form onSubmit={handleCreateQuiz} className="space-y-6">
-            
-            {/* Step 1: Subject & Material Card */}
-            <div className="dashboard-card-clean">
-              <h3 className="text-xs font-black uppercase text-[#059669] tracking-wider mb-4 flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-[#059669]" />
-                1. MATA PELAJARAN & MATERI SOAL
-              </h3>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-black text-white flex items-center gap-2">
+                <PlusCircle className="w-6 h-6 text-emerald-400" />
+                Buat Kuis Game Edukasi Baru
+              </h2>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">
+                Pilih mata pelajaran, durasi, dan jenis mini-game untuk membuat kuis interaktif siswa.
+              </p>
+            </div>
+          </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="form-group-clean">
-                  <label className="form-label-clean">Mata Pelajaran SMP</label>
-                  <select
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    className="form-select-clean font-bold"
-                  >
+          <form onSubmit={handleCreateQuiz} className="space-y-8">
+            
+            {/* Step 1: Mata Pelajaran & Materi */}
+            <div className="glass-card p-6 sm:p-8 space-y-6">
+              <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 font-black text-sm flex items-center justify-center border border-emerald-500/30">
+                  1
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-white">Mata Pelajaran & Materi SMP</h3>
+                  <p className="text-xs text-slate-400">Pilih rumpun mata pelajaran dan topik bahasan kuis</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-black text-slate-300 uppercase tracking-wider mb-2">
+                    Pilih Mata Pelajaran
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
                     {SUBJECTS.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.icon} {s.name}
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => {
+                          setSubject(s.id);
+                          setMaterial(s.materials[0]);
+                        }}
+                        className={`p-3 rounded-xl text-left border flex items-center gap-2.5 transition cursor-pointer ${
+                          subject === s.id
+                            ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold shadow-lg shadow-emerald-900/20'
+                            : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-800/60'
+                        }`}
+                      >
+                        <span className="text-xl">{s.icon}</span>
+                        <span className="text-xs font-bold">{s.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-black text-slate-300 uppercase tracking-wider mb-2">
+                    Pilih Topik / Materi Pokok
+                  </label>
+                  <select
+                    value={material}
+                    onChange={(e) => setMaterial(e.target.value)}
+                    className="form-select-cyber pl-4 h-12"
+                  >
+                    {currentSubjectData.materials.map((m) => (
+                      <option key={m} value={m}>
+                        📚 {m}
                       </option>
                     ))}
                   </select>
-                </div>
 
-                <div className="form-group-clean">
-                  <label className="form-label-clean">Materi Pokok Soal</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Contoh: Sistem Pencernaan / Aljabar"
-                    value={material}
-                    onChange={(e) => setMaterial(e.target.value)}
-                    className="form-input-clean"
-                    style={{ paddingLeft: '16px' }}
-                  />
+                  <div className="mt-4 p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between text-xs text-slate-300">
+                    <span className="flex items-center gap-2">
+                      <HelpCircle className="w-4 h-4 text-emerald-400" />
+                      Jumlah Pertanyaan Soal:
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {[5, 10, 15].map((cnt) => (
+                        <button
+                          key={cnt}
+                          type="button"
+                          onClick={() => setQuestionCount(cnt)}
+                          className={`px-3 py-1 rounded-lg text-xs font-extrabold transition cursor-pointer ${
+                            questionCount === cnt
+                              ? 'bg-emerald-500 text-slate-950 shadow'
+                              : 'bg-slate-800 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          {cnt} Soal
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Step 2: Question Count & Timer Duration Card */}
-            <div className="dashboard-card-clean">
-              <h3 className="text-xs font-black uppercase text-[#059669] tracking-wider mb-4 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#059669]" />
-                2. JUMLAH SOAL & DURASI WAKTU
-              </h3>
+            {/* Step 2: Durasi Pengerjaan Kuis */}
+            <div className="glass-card p-6 sm:p-8 space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 font-black text-sm flex items-center justify-center border border-cyan-500/30">
+                    2
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-white">Durasi Pengerjaan Kuis</h3>
+                    <p className="text-xs text-slate-400">Atur alokasi waktu maksimal siswa menjawab kuis</p>
+                  </div>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="form-group-clean">
-                  <label className="form-label-clean">Jumlah Soal (3 - 30 Soal)</label>
+                {/* Preset Chips */}
+                <div className="flex items-center gap-2">
+                  {[3, 5, 10, 15].map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setQuickDuration(m)}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                        minutes === m && hours === 0 && seconds === 0
+                          ? 'bg-cyan-500 text-slate-950 font-black'
+                          : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {m} Menit
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto text-center">
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">JAM</label>
                   <input
                     type="number"
-                    min="3"
-                    max="30"
-                    required
-                    value={questionCount}
-                    onChange={(e) => setQuestionCount(Number(e.target.value))}
-                    className="form-input-clean text-base font-black text-[#059669]"
-                    style={{ paddingLeft: '16px' }}
+                    min="0"
+                    max="5"
+                    value={hours}
+                    onChange={(e) => setHours(Math.max(0, parseInt(e.target.value) || 0))}
+                    className="w-full text-center py-3 bg-slate-900 border border-slate-800 rounded-xl font-black text-xl text-white focus:border-cyan-500 outline-none"
                   />
                 </div>
-
-                <div className="form-group-clean">
-                  <label className="form-label-clean">Durasi Waktu Game</label>
-                  
-                  {/* Preset Pills */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    <button
-                      type="button"
-                      onClick={() => setQuickDuration(5)}
-                      className={`preset-chip-clean ${minutes === 5 && hours === 0 ? 'active' : ''}`}
-                    >
-                      5 Menit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setQuickDuration(10)}
-                      className={`preset-chip-clean ${minutes === 10 && hours === 0 ? 'active' : ''}`}
-                    >
-                      10 Menit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setQuickDuration(15)}
-                      className={`preset-chip-clean ${minutes === 15 && hours === 0 ? 'active' : ''}`}
-                    >
-                      15 Menit
-                    </button>
-                  </div>
-
-                  {/* Manual Inputs */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <span className="text-[10px] text-slate-500 font-bold block mb-1">Jam</span>
-                      <input
-                        type="number"
-                        min="0"
-                        max="5"
-                        value={hours}
-                        onChange={(e) => setHours(Number(e.target.value))}
-                        className="form-input-clean text-center text-sm font-bold"
-                        style={{ paddingLeft: '10px', paddingRight: '10px' }}
-                      />
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 font-bold block mb-1">Menit</span>
-                      <input
-                        type="number"
-                        min="0"
-                        max="59"
-                        value={minutes}
-                        onChange={(e) => setMinutes(Number(e.target.value))}
-                        className="form-input-clean text-center text-sm font-bold"
-                        style={{ paddingLeft: '10px', paddingRight: '10px' }}
-                      />
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 font-bold block mb-1">Detik</span>
-                      <input
-                        type="number"
-                        min="0"
-                        max="59"
-                        value={seconds}
-                        onChange={(e) => setSeconds(Number(e.target.value))}
-                        className="form-input-clean text-center text-sm font-bold"
-                        style={{ paddingLeft: '10px', paddingRight: '10px' }}
-                      />
-                    </div>
-                  </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">MENIT</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="59"
+                    value={minutes}
+                    onChange={(e) => setMinutes(Math.max(0, parseInt(e.target.value) || 0))}
+                    className="w-full text-center py-3 bg-slate-900 border border-slate-800 rounded-xl font-black text-xl text-cyan-400 focus:border-cyan-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">DETIK</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="59"
+                    value={seconds}
+                    onChange={(e) => setSeconds(Math.max(0, parseInt(e.target.value) || 0))}
+                    className="w-full text-center py-3 bg-slate-900 border border-slate-800 rounded-xl font-black text-xl text-white focus:border-cyan-500 outline-none"
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Step 3: Game Type Selection via DROPDOWN MENU */}
-            <div className="dashboard-card-clean">
-              <h3 className="text-xs font-black uppercase text-[#059669] tracking-wider mb-4 flex items-center gap-2">
-                <Gamepad2 className="w-4 h-4 text-[#059669]" />
-                3. PILIH JENIS MINI-GAME (DROPDOWN)
-              </h3>
+            {/* Step 3: Pilih Mini Game Edukasi */}
+            <div className="glass-card p-6 sm:p-8 space-y-6">
+              <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 font-black text-sm flex items-center justify-center border border-amber-500/30">
+                  3
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-white">Pilih Jenis Game Edukasi Interaktif</h3>
+                  <p className="text-xs text-slate-400">Setiap game memiliki mekanisme gameplay seru yang disukai siswa SMP</p>
+                </div>
+              </div>
 
-              <div className="form-group-clean mb-0">
-                <label className="form-label-clean">PILIH VARIASI GAME YANG DIINGINKAN</label>
-                <select
-                  value={gameType}
-                  onChange={(e) => setGameType(e.target.value)}
-                  className="form-select-clean text-base font-bold py-3.5"
-                >
-                  {GAME_TYPES.map((gt) => (
-                    <option key={gt.id} value={gt.id}>
-                      {gt.icon} {gt.name} — {gt.desc}
-                    </option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {GAME_TYPES.map((gt) => {
+                  const isSelected = gameType === gt.id;
+                  return (
+                    <div
+                      key={gt.id}
+                      onClick={() => setGameType(gt.id)}
+                      className={`p-5 rounded-2xl border transition-all cursor-pointer relative overflow-hidden ${
+                        isSelected
+                          ? 'bg-gradient-to-b from-amber-500/20 to-slate-900 border-amber-400 shadow-xl shadow-amber-900/20 ring-2 ring-amber-400/30'
+                          : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900/90'
+                      }`}
+                    >
+                      {isSelected && (
+                        <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center text-xs font-black">
+                          ✓
+                        </div>
+                      )}
+                      <div className="text-4xl mb-3">{gt.icon}</div>
+                      <h4 className="font-extrabold text-white text-base mb-1">{gt.name}</h4>
+                      <p className="text-xs text-slate-400 leading-relaxed">{gt.desc}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Optional Question Bank Preview Toggle */}
-            <div className="dashboard-card-clean p-4 sm:p-6">
+            {/* Submit Action Bar */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 glass-card border-emerald-500/30">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-6 h-6 text-emerald-400 shrink-0" />
+                <div>
+                  <p className="text-sm font-bold text-white">
+                    Siap Mempublikasikan Kuis {subject} - {material}?
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Kuis akan langsung tersimpan & dapat dimainkan oleh siswa via link share.
+                  </p>
+                </div>
+              </div>
+
               <button
-                type="button"
-                onClick={() => setShowQuestionPreview(!showQuestionPreview)}
-                className="w-full flex items-center justify-between text-xs font-bold text-slate-700"
+                type="submit"
+                className="w-full sm:w-auto px-8 py-4 btn-emerald-glow text-base font-black uppercase tracking-wider cursor-pointer"
               >
-                <span className="flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-[#059669]" />
-                  Pratinjau Bank Soal Otomatis ({questions.length} Soal)
-                </span>
-                <ChevronRight className={`w-4 h-4 text-[#059669] transition-transform ${showQuestionPreview ? 'rotate-90' : ''}`} />
+                <PlusCircle className="w-5 h-5" />
+                Terbitkan & Bagikan Kuis
               </button>
-
-              {showQuestionPreview && (
-                <div className="mt-4 pt-4 border-t border-slate-200 space-y-3 max-h-60 overflow-y-auto pr-2">
-                  {questions.map((q, idx) => (
-                    <div key={q.id} className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-[#059669]">Soal #{idx + 1}</span>
-                        <span className="text-[10px] text-slate-600 bg-slate-200 px-2 py-0.5 rounded font-bold">
-                          Jawaban: ({String.fromCharCode(65 + q.correctAnswer)})
-                        </span>
-                      </div>
-                      <p className="font-semibold text-slate-800">{q.question}</p>
-                      <p className="text-[11px] text-slate-500 mt-1 italic">
-                        Penjelasan: {q.explanation}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="btn-emerald py-4 text-base font-bold"
-            >
-              <Share2 className="w-5 h-5" />
-              Generate Link Kuis Sekarang
-            </button>
 
           </form>
         </div>
       )}
 
-      {/* Tab 2: My Quizzes List */}
+      {/* Tab 2: Kuis Saya */}
       {activeTab === 'quizzes' && (
-        <div className="animate-fadeIn">
-          <div className="flex items-center justify-between mb-6">
+        <div className="space-y-6 animate-fadeIn">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-black text-slate-900">Daftar Kuis Saya</h2>
-              <p className="text-xs text-slate-500">Kuis edukasi yang telah Anda buat untuk siswa SMP.</p>
+              <h2 className="text-2xl font-black text-white flex items-center gap-2">
+                <BookOpen className="w-6 h-6 text-cyan-400" />
+                Kuis Saya ({myQuizzes.length})
+              </h2>
+              <p className="text-xs text-slate-400">
+                Daftar kuis yang telah Anda buat. Salin link untuk dibagikan ke kelas siswa Anda.
+              </p>
             </div>
+            
             <button
               onClick={() => setActiveTab('create')}
-              className="btn-emerald text-xs py-2 px-4 w-auto"
+              className="btn-emerald-glow text-xs py-2.5 px-4"
             >
               <PlusCircle className="w-4 h-4" />
               Buat Kuis Baru
             </button>
           </div>
 
-          {myQuizzes.length === 0 ? (
-            <div className="dashboard-card-clean p-12 text-center text-slate-400">
-              <BookOpen className="w-12 h-12 mx-auto mb-3 text-slate-400" />
-              <p className="font-bold text-sm text-slate-700">Belum ada kuis yang dibuat.</p>
-              <p className="text-xs mt-1 text-slate-500">Klik tombol "Buat Kuis Baru" untuk membuat game pertama Anda.</p>
+          {loading ? (
+            <div className="glass-card p-12 text-center text-slate-400 font-bold">
+              Memuat daftar kuis...
+            </div>
+          ) : myQuizzes.length === 0 ? (
+            <div className="glass-card p-12 text-center space-y-3">
+              <div className="w-16 h-16 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center mx-auto text-2xl">
+                📚
+              </div>
+              <h3 className="text-lg font-bold text-white">Belum ada kuis yang dibuat</h3>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                Klik tombol "Buat Kuis Baru" di atas untuk mulai membuat kuis game edukasi SMP pertama Anda.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {myQuizzes.map((q) => {
-                const gameInfo = GAME_TYPES.find(gt => gt.id === q.game_type) || GAME_TYPES[0];
-                const shareUrl = getQuizShareUrl(q);
+              {myQuizzes.map((quiz) => {
+                const shareUrl = getQuizShareUrl(quiz);
+                const gameIcon = quiz.game_type === 'fishing' ? '🎣' : quiz.game_type === 'balloon' ? '🎯' : quiz.game_type === 'catch_ball' ? '🏀' : '⚔️';
 
                 return (
-                  <div key={q.id} className="dashboard-card-clean p-6 flex flex-col justify-between mb-0">
+                  <div key={quiz.id} className="glass-card p-6 flex flex-col justify-between space-y-4">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-2xl">{gameInfo.icon}</span>
-                        <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-50 text-[#059669] border border-emerald-200">
-                          {q.share_code || 'CODE'}
+                        <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          {quiz.subject}
+                        </span>
+                        <span className="text-xs font-extrabold text-slate-400 flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                          {Math.round(quiz.duration_seconds / 60)} Menit
                         </span>
                       </div>
 
-                      <h3 className="font-black text-lg text-slate-900 mb-1">{q.subject}</h3>
-                      <p className="text-xs font-bold text-[#059669] mb-3">Materi: {q.material}</p>
+                      <h3 className="text-lg font-black text-white leading-snug">
+                        {quiz.material}
+                      </h3>
 
-                      <div className="space-y-1 text-xs text-slate-600 mb-4">
-                        <p>• Jumlah Soal: <strong className="text-slate-800">{q.question_count} Soal</strong></p>
-                        <p>• Durasi: <strong className="text-slate-800">{Math.floor(q.duration_seconds / 60)} Menit</strong></p>
-                        <p>• Game: <strong className="text-slate-800">{gameInfo.name}</strong></p>
-                      </div>
+                      <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
+                        <span>{gameIcon}</span>
+                        <span>Game: <strong className="text-slate-200 uppercase">{quiz.game_type.replace('_', ' ')}</strong></span>
+                        <span>&bull;</span>
+                        <span>{quiz.question_count || quiz.questions?.length || 5} Soal</span>
+                      </p>
                     </div>
 
-                    <div className="pt-4 border-t border-slate-200 space-y-2">
-                      <button
-                        onClick={() => handleOpenGameInNewTab(q)}
-                        className="btn-emerald text-xs py-2 justify-center font-bold"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        Uji Game di Tab Baru ↗
-                      </button>
-
+                    <div className="space-y-2 pt-2 border-t border-slate-800">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleCopyLink(shareUrl)}
-                          className="flex-1 btn-secondary-clean justify-center py-2 text-xs font-semibold"
+                          className="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-bold text-slate-200 flex items-center justify-center gap-1.5 transition cursor-pointer"
                         >
-                          <Copy className="w-3.5 h-3.5" />
-                          Salin Link
+                          <Copy className="w-3.5 h-3.5 text-emerald-400" />
+                          Salin Link Siswa
                         </button>
+                        
                         <button
-                          onClick={() => handleDeleteQuiz(q.id)}
-                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          onClick={() => onPlayCreatedQuiz(quiz)}
+                          className="py-2.5 px-3 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1 transition cursor-pointer hover:bg-emerald-500/30"
+                          title="Uji Main Kuis Ini"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                          Uji
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteQuiz(quiz.id)}
+                          className="py-2.5 px-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold hover:bg-rose-500/20 transition cursor-pointer"
+                          title="Hapus Kuis"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
+
                   </div>
                 );
               })}
@@ -478,164 +517,168 @@ export default function TeacherDashboard({
         </div>
       )}
 
-      {/* Tab 3: Teacher Results & Download PDF Ranking */}
+      {/* Tab 3: Rekap Nilai Siswa */}
       {activeTab === 'results' && (
-        <div className="animate-fadeIn">
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="space-y-6 animate-fadeIn">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-                <Trophy className="w-6 h-6 text-amber-500" />
-                Rekap Hasil & Ranking Siswa
+              <h2 className="text-2xl font-black text-white flex items-center gap-2">
+                <Trophy className="w-6 h-6 text-amber-400" />
+                Rekapitulasi Nilai Siswa ({teacherResults.length})
               </h2>
-              <p className="text-xs text-slate-500">
-                Data hasil soal siswa terkumpul otomatis dan ter-ranking dari nilai tertinggi.
+              <p className="text-xs text-slate-400">
+                Data nilai pengerjaan kuis siswa secara otomatis tersimpan & terkalibrasi.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <select
-                value={filterQuizId}
-                onChange={(e) => setFilterQuizId(e.target.value)}
-                className="form-select-clean py-2 text-xs font-semibold"
-              >
-                <option value="ALL">Semua Kuis ({myQuizzes.length})</option>
-                {myQuizzes.map(q => (
-                  <option key={q.id} value={q.id}>
-                    {q.subject} - {q.material}
-                  </option>
-                ))}
-              </select>
-
+            {teacherResults.length > 0 && (
               <button
-                onClick={handleExportPDF}
-                className="btn-emerald text-xs py-2.5 px-4 font-bold shrink-0 w-auto"
+                onClick={() => exportTeacherResultsPDF(teacherResults, user?.name)}
+                className="btn-cyan-glow text-xs py-2.5 px-4"
               >
                 <Download className="w-4 h-4" />
-                Unduh PDF Ranking
+                Unduh Rekap PDF
               </button>
-            </div>
+            )}
           </div>
 
-          {/* Results Table */}
-          <div className="dashboard-card-clean overflow-hidden p-0 mb-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-700">
-                <thead className="bg-slate-50 text-xs font-bold uppercase text-slate-600 border-b border-slate-200">
-                  <tr>
-                    <th className="py-4 px-6">Ranking</th>
-                    <th className="py-4 px-6">Nama Siswa</th>
-                    <th className="py-4 px-6">Kelas</th>
-                    <th className="py-4 px-6">Mata Pelajaran & Materi</th>
-                    <th className="py-4 px-6">Jawaban Benar</th>
-                    <th className="py-4 px-6">Nilai Akhir</th>
-                    <th className="py-4 px-6">Tanggal</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {teacherResults.length === 0 ? (
-                    <tr>
-                      <td colSpan="7" className="py-12 text-center text-slate-500 text-sm">
-                        Belum ada siswa yang mengerjakan kuis Anda. Bagikan link kuis ke murid SMP!
-                      </td>
+          {loading ? (
+            <div className="glass-card p-12 text-center text-slate-400 font-bold">
+              Memuat data rekap nilai...
+            </div>
+          ) : teacherResults.length === 0 ? (
+            <div className="glass-card p-12 text-center space-y-3">
+              <div className="w-16 h-16 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center mx-auto text-2xl">
+                🏆
+              </div>
+              <h3 className="text-lg font-bold text-white">Belum ada nilai siswa masuk</h3>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                Bagikan link kuis kepada siswa Anda. Ketika siswa menyelesaikan game kuis, nilai mereka akan otomatis muncul di sini.
+              </p>
+            </div>
+          ) : (
+            <div className="glass-card overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-900/80 border-b border-slate-800 text-[11px] font-black text-slate-400 uppercase tracking-wider">
+                      <th className="p-4">NAMA SISWA</th>
+                      <th className="p-4">KELAS</th>
+                      <th className="p-4">MATPEL & MATERI</th>
+                      <th className="p-4 text-center">SKOR / NILAI</th>
+                      <th className="p-4 text-center">BENAR</th>
+                      <th className="p-4 text-center">STATUS</th>
+                      <th className="p-4 text-right">TANGGAL</th>
                     </tr>
-                  ) : (
-                    teacherResults
-                      .filter(r => filterQuizId === 'ALL' || r.quiz_id === filterQuizId)
-                      .map((res, index) => (
-                        <tr key={res.id || index} className="hover:bg-slate-50 transition-colors">
-                          <td className="py-4 px-6 font-black text-sm">
-                            {index === 0 ? (
-                              <span className="text-amber-500 font-black">🥇 #1</span>
-                            ) : index === 1 ? (
-                              <span className="text-slate-500 font-bold">🥈 #2</span>
-                            ) : index === 2 ? (
-                              <span className="text-amber-700 font-bold">🥉 #3</span>
-                            ) : (
-                              <span className="text-slate-400">#{index + 1}</span>
-                            )}
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 text-xs font-semibold text-slate-200">
+                    {teacherResults.map((res, idx) => {
+                      const isPassed = (res.score || 0) >= 70;
+                      return (
+                        <tr key={idx} className="hover:bg-slate-800/40 transition">
+                          <td className="p-4 font-extrabold text-white">
+                            {res.student_name}
                           </td>
-                          <td className="py-4 px-6 font-bold text-slate-900">{res.student_name}</td>
-                          <td className="py-4 px-6 font-medium text-slate-500">{res.student_class || '-'}</td>
-                          <td className="py-4 px-6">
-                            <p className="font-semibold text-[#059669]">{res.subject}</p>
-                            <p className="text-xs text-slate-500">{res.material}</p>
+                          <td className="p-4">
+                            <span className="px-2 py-0.5 rounded bg-slate-800 text-cyan-300 font-extrabold">
+                              {res.student_class}
+                            </span>
                           </td>
-                          <td className="py-4 px-6 font-bold">
-                            {res.correct_count} / {res.total_questions}
+                          <td className="p-4">
+                            <span className="font-bold text-slate-300">{res.subject}</span>
+                            <span className="block text-[11px] text-slate-400 font-normal">{res.material}</span>
                           </td>
-                          <td className="py-4 px-6">
-                            <span className="text-lg font-black text-amber-600">
+                          <td className="p-4 text-center">
+                            <span className={`text-base font-black ${isPassed ? 'text-emerald-400' : 'text-rose-400'}`}>
                               {res.score}
                             </span>
                           </td>
-                          <td className="py-4 px-6 text-xs text-slate-500">
-                            {new Date(res.completed_at || Date.now()).toLocaleDateString('id-ID')}
+                          <td className="p-4 text-center text-slate-300 font-bold">
+                            {res.correct_count} / {res.total_questions}
+                          </td>
+                          <td className="p-4 text-center">
+                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-black tracking-wider uppercase ${
+                              isPassed 
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
+                                : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                            }`}>
+                              {isPassed ? 'LULUS' : 'REMIDIAL'}
+                            </span>
+                          </td>
+                          <td className="p-4 text-right text-slate-400 font-normal text-[11px]">
+                            {new Date(res.completed_at || Date.now()).toLocaleDateString('id-ID', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
                           </td>
                         </tr>
-                      ))
-                  )}
-                </tbody>
-              </table>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
-      {/* Share Link Modal Popup */}
+      {/* Share Modal Dialog */}
       {createdQuizModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-          <div className="relative w-full max-w-md dashboard-card-clean p-6 text-center shadow-2xl mb-0">
-            
-            <div className="w-14 h-14 rounded-full bg-emerald-100 text-[#059669] mx-auto mb-3 flex items-center justify-center border border-emerald-200">
-              <CheckCircle2 className="w-8 h-8" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+          <div className="glass-card max-w-md w-full p-6 text-center space-y-5 border-emerald-500/40">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-3xl mx-auto shadow-lg shadow-emerald-900/30">
+              🎉
             </div>
 
-            <h3 className="text-xl font-black text-slate-900 mb-1">Game Kuis Berhasil Dibuat!</h3>
-            <p className="text-xs text-slate-500 mb-5">
-              Bagikan link aplikasi di bawah ini kepada siswa SMP Anda.
-            </p>
+            <div>
+              <h3 className="text-xl font-black text-white">Kuis Berhasil Diterbitkan!</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Kuis <strong className="text-emerald-400">{createdQuizModal.subject} - {createdQuizModal.material}</strong> telah siap dimainkan siswa.
+              </p>
+            </div>
 
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 mb-5 text-left">
-              <span className="text-[10px] text-[#059669] font-bold uppercase tracking-wider block mb-1">
-                Link Aplikasi Siswa:
-              </span>
+            <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 text-left space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">LINK SHARE SISWA:</label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   readOnly
                   value={getQuizShareUrl(createdQuizModal)}
-                  className="form-input-clean text-xs font-mono bg-white text-slate-800 py-2"
-                  style={{ paddingLeft: '12px' }}
+                  className="w-full bg-slate-900 border border-slate-800 text-xs font-mono text-cyan-300 p-2.5 rounded-xl outline-none"
                 />
                 <button
                   onClick={() => handleCopyLink(getQuizShareUrl(createdQuizModal))}
-                  className="btn-secondary-clean py-2 px-3 text-xs shrink-0"
+                  className="px-4 py-2.5 btn-emerald-glow text-xs whitespace-nowrap shrink-0"
                 >
-                  {copiedLink ? <Check className="w-4 h-4 text-[#059669]" /> : <Copy className="w-4 h-4" />}
+                  {copiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {copiedLink ? 'Tersalin!' : 'Salin'}
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 pt-2">
               <button
-                onClick={() => setCreatedQuizModal(null)}
-                className="flex-1 btn-secondary-clean justify-center py-2.5 text-xs font-semibold"
+                onClick={() => {
+                  setCreatedQuizModal(null);
+                  setActiveTab('quizzes');
+                }}
+                className="flex-1 py-3 btn-glass-secondary text-xs font-bold"
               >
-                Tutup
+                Lihat Kuis Saya
               </button>
-              
+
               <button
                 onClick={() => {
                   const q = createdQuizModal;
                   setCreatedQuizModal(null);
-                  handleOpenGameInNewTab(q);
+                  onPlayCreatedQuiz(q);
                 }}
-                className="flex-1 btn-emerald justify-center py-2.5 text-xs font-bold"
+                className="flex-1 py-3 btn-emerald-glow text-xs font-bold"
               >
-                Uji di Tab Baru ↗
+                Uji Main Kuis
               </button>
             </div>
-
           </div>
         </div>
       )}
