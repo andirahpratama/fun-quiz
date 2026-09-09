@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Target, PlusCircle, Trophy, BookOpen, LogOut, ChevronDown } from 'lucide-react';
+import { Target, PlusCircle, Trophy, BookOpen, LogOut, ChevronDown, User } from 'lucide-react';
 
 export default function Navbar({
   user,
@@ -13,7 +13,7 @@ export default function Navbar({
 
   const getInitials = (name) => {
     if (!name) return 'G';
-    const parts = name.split(' ');
+    const parts = name.trim().split(' ');
     if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
     return name.substring(0, 2).toUpperCase();
   };
@@ -39,7 +39,7 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Center: SINGLE Unified Navigation Menu */}
+        {/* Center: Navigation Menu Pills */}
         {user && (
           <nav className="flex items-center gap-1.5 sm:gap-2">
             <button
@@ -68,38 +68,90 @@ export default function Navbar({
           </nav>
         )}
 
-        {/* Right Side: Single User Avatar Badge */}
-        <div className="flex items-center gap-3 relative">
+        {/* Right Side: Profile Menu Dropdown (Far Right Position) */}
+        <div className="flex items-center gap-3 relative shrink-0">
           {user ? (
             <div className="relative">
               <button
+                type="button"
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 transition-colors"
+                style={{
+                  background: 'rgba(15, 23, 42, 0.9)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '9999px',
+                  padding: '6px 14px',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                }}
               >
-                <div className="w-7 h-7 rounded-full bg-[#10b981] flex items-center justify-center text-slate-950 font-black text-xs shrink-0">
+                <div 
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    background: '#10b981',
+                    color: '#030712',
+                    fontWeight: 900,
+                    fontSize: '11px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
                   {getInitials(user.name)}
                 </div>
-                <span className="hidden sm:block text-xs font-bold text-slate-200 max-w-[120px] truncate">
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#f8fafc' }} className="hidden sm:inline">
                   {user.name}
                 </span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <ChevronDown style={{ width: '14px', height: '14px', color: '#94a3b8' }} />
               </button>
 
-              {/* Profile Dropdown Menu */}
+              {/* Styled Profile Dropdown Menu */}
               {showProfileMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 z-50 animate-fadeIn">
-                  <div className="px-4 py-2 border-b border-slate-800">
-                    <p className="text-xs font-bold text-white truncate">{user.name}</p>
-                    <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
+                <div 
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: 'calc(100% + 8px)',
+                    width: '220px',
+                    background: '#0f172a',
+                    border: '1px solid #334155',
+                    borderRadius: '16px',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+                    padding: '8px 0',
+                    zIndex: 9999,
+                  }}
+                >
+                  <div style={{ padding: '8px 16px', borderBottom: '1px solid #1e293b' }}>
+                    <p style={{ fontSize: '12px', fontWeight: 800, color: '#ffffff', margin: 0 }}>{user.name}</p>
+                    <p style={{ fontSize: '10px', color: '#94a3b8', margin: '2px 0 0 0' }}>{user.email}</p>
                   </div>
+                  
                   <button
+                    type="button"
                     onClick={() => {
                       setShowProfileMenu(false);
                       onLogout();
                     }}
-                    className="w-full text-left px-4 py-2 text-xs font-bold text-rose-400 hover:bg-rose-500/10 flex items-center gap-2"
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '10px 16px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#fb7185',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut style={{ width: '14px', height: '14px' }} />
                     Keluar Akun
                   </button>
                 </div>

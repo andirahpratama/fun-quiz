@@ -37,21 +37,21 @@ export default function QuestionModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-xl bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-indigo-500/20">
+      <div className="relative w-full max-w-xl bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl">
         
         {/* Question Header Badge */}
         <div className="flex items-center justify-between mb-4">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
             <HelpCircle className="w-4 h-4" />
             Soal Nomor #{question.questionNumber}
           </span>
           <span className="text-xs text-slate-400 font-semibold">
-            Pilihlah 1 Jawaban yang Paling Tepat
+            Klik Pilihan Jawaban (A, B, C, D)
           </span>
         </div>
 
         {/* Question Content Text */}
-        <div className="bg-slate-800/60 p-4 sm:p-5 rounded-2xl border border-slate-700 mb-6">
+        <div className="bg-slate-800/80 p-4 sm:p-5 rounded-2xl border border-slate-700 mb-6">
           <p className="text-base sm:text-lg font-bold text-slate-100 leading-relaxed">
             {question.question}
           </p>
@@ -61,7 +61,7 @@ export default function QuestionModal({
         <div className="space-y-3 mb-6">
           {question.options.map((opt, idx) => {
             const letter = String.fromCharCode(65 + idx); // A, B, C, D
-            let optionStyle = 'bg-slate-800/40 border-slate-700/80 hover:bg-slate-800 hover:border-indigo-500 text-slate-200';
+            let optionStyle = 'bg-slate-800/60 border-slate-700 hover:bg-slate-800 text-slate-200';
 
             if (hasAnswered) {
               if (idx === question.correctAnswer) {
@@ -78,9 +78,10 @@ export default function QuestionModal({
             return (
               <button
                 key={idx}
+                type="button"
                 disabled={hasAnswered}
                 onClick={() => handleOptionClick(idx)}
-                className={`w-full text-left p-3.5 sm:p-4 rounded-xl border flex items-center gap-3.5 transition-all text-sm sm:text-base ${optionStyle}`}
+                className={`w-full text-left p-3.5 sm:p-4 rounded-xl border flex items-center gap-3.5 transition-all text-sm sm:text-base cursor-pointer ${optionStyle}`}
               >
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-extrabold text-sm shrink-0 ${
                   hasAnswered && idx === question.correctAnswer
@@ -91,7 +92,7 @@ export default function QuestionModal({
                 }`}>
                   {letter}
                 </div>
-                <span className="flex-1 font-medium">{opt}</span>
+                <span className="flex-1 font-semibold">{opt}</span>
 
                 {hasAnswered && idx === question.correctAnswer && (
                   <CheckCircle2 className="w-6 h-6 text-emerald-400 shrink-0" />
@@ -122,7 +123,7 @@ export default function QuestionModal({
                 <h4 className="font-extrabold text-base">
                   {isCorrect ? 'Jawaban Benar! 🎉' : 'Jawaban Salah! ❌'}
                 </h4>
-                <p className="text-xs opacity-90">
+                <p className="text-xs opacity-90 mt-0.5">
                   {isCorrect 
                     ? 'Selamat, poin kamu bertambah!' 
                     : `Jawaban yang benar adalah pilihan (${String.fromCharCode(65 + question.correctAnswer)}): ${question.options[question.correctAnswer]}`}
@@ -143,10 +144,11 @@ export default function QuestionModal({
 
             {/* Next Action Button */}
             <button
+              type="button"
               onClick={handleNext}
-              className="w-full btn-gradient-primary justify-center py-3.5 text-base font-bold"
+              className="btn-emerald py-3.5 text-base font-bold"
             >
-              Lanjut ke Game berikutnya
+              Lanjut ke Game Berikutnya
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>
