@@ -25,6 +25,63 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* 3D Arcade Buttons */
+.btn-3d {
+  transition: all 0.1s ease;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+.btn-3d:active {
+  transform: translateY(4px);
+}
+.btn-3d-yellow {
+  background: linear-gradient(180deg, #FDE047 0%, #EAB308 100%);
+  box-shadow: 0 6px 0 #CA8A04, 0 10px 15px rgba(0, 0, 0, 0.25);
+  color: #0f172a;
+}
+.btn-3d-yellow:active {
+  box-shadow: 0 2px 0 #CA8A04, 0 5px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-3d-cyan {
+  background: linear-gradient(180deg, #38BDF8 0%, #0284C7 100%);
+  box-shadow: 0 6px 0 #0369A1, 0 10px 15px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+}
+.btn-3d-cyan:active {
+  box-shadow: 0 2px 0 #0369A1, 0 5px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-3d-emerald {
+  background: linear-gradient(180deg, #34D399 0%, #059669 100%);
+  box-shadow: 0 6px 0 #047857, 0 10px 15px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+}
+.btn-3d-emerald:active {
+  box-shadow: 0 2px 0 #047857, 0 5px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-3d-rose {
+  background: linear-gradient(180deg, #FB7185 0%, #E11D48 100%);
+  box-shadow: 0 6px 0 #BE123C, 0 10px 15px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+}
+.btn-3d-rose:active {
+  box-shadow: 0 2px 0 #BE123C, 0 5px 8px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes floatingBubbles {
+  0% { transform: translateY(100%) scale(0.8); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(-120%) scale(1.2); opacity: 0; }
+}
+.bubble {
+  position: absolute;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.15));
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatingBubbles linear infinite;
+}
+
 body {
   background-color: var(--bg-page);
   color: var(--text-dark);
