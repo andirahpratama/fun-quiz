@@ -22,10 +22,10 @@ export default function Navbar({
     <header className="navy-header sticky top-0 z-40 w-full shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Left Side: Brand Logo (Neraca UMKM Style) */}
+        {/* Left Side: Brand Logo */}
         <div 
           onClick={onResetToHome}
-          className="flex items-center gap-3 cursor-pointer group"
+          className="flex items-center gap-3 cursor-pointer group shrink-0"
         >
           <div className="w-10 h-10 rounded-xl bg-[#059669] flex items-center justify-center text-white text-xl shadow-md shadow-emerald-900/40">
             🎯
@@ -39,15 +39,15 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Center: Navigation Menu Pills */}
+        {/* Center: SINGLE Unified Navigation Menu */}
         {user && (
-          <nav className="hidden md:flex items-center gap-1 bg-slate-900/60 p-1 rounded-full border border-slate-800">
+          <nav className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={() => setActiveTab('create')}
               className={`nav-link-item ${activeTab === 'create' ? 'active' : ''}`}
             >
               <PlusCircle className="w-4 h-4" />
-              Buat Kuis
+              <span className="text-xs sm:text-sm">Buat Kuis</span>
             </button>
 
             <button
@@ -55,7 +55,7 @@ export default function Navbar({
               className={`nav-link-item ${activeTab === 'quizzes' ? 'active' : ''}`}
             >
               <BookOpen className="w-4 h-4" />
-              Kuis Saya
+              <span className="text-xs sm:text-sm">Kuis Saya</span>
             </button>
 
             <button
@@ -63,31 +63,31 @@ export default function Navbar({
               className={`nav-link-item ${activeTab === 'results' ? 'active' : ''}`}
             >
               <Trophy className="w-4 h-4" />
-              Rekap Nilai
+              <span className="text-xs sm:text-sm">Rekap Nilai</span>
             </button>
           </nav>
         )}
 
-        {/* Right Side: User Profile Avatar Badge (Neraca UMKM Style) */}
+        {/* Right Side: Single User Avatar Badge */}
         <div className="flex items-center gap-3 relative">
           {user ? (
             <div className="relative">
               <button
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="flex items-center gap-2.5 bg-slate-900/80 hover:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700/80 transition-colors"
+                className="flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 transition-colors"
               >
-                <div className="w-7 h-7 rounded-full bg-[#10b981] flex items-center justify-center text-slate-950 font-black text-xs">
+                <div className="w-7 h-7 rounded-full bg-[#10b981] flex items-center justify-center text-slate-950 font-black text-xs shrink-0">
                   {getInitials(user.name)}
                 </div>
-                <span className="hidden sm:block text-xs font-bold text-slate-200">
+                <span className="hidden sm:block text-xs font-bold text-slate-200 max-w-[120px] truncate">
                   {user.name}
                 </span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
               </button>
 
               {/* Profile Dropdown Menu */}
               {showProfileMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl py-2 z-50 animate-fadeIn">
+                <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-2 z-50 animate-fadeIn">
                   <div className="px-4 py-2 border-b border-slate-800">
                     <p className="text-xs font-bold text-white truncate">{user.name}</p>
                     <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
@@ -109,33 +109,6 @@ export default function Navbar({
         </div>
 
       </div>
-
-      {/* Mobile Nav Pills */}
-      {user && (
-        <div className="md:hidden flex items-center justify-around bg-slate-950 py-2 border-t border-slate-800 px-2 gap-1">
-          <button
-            onClick={() => setActiveTab('create')}
-            className={`nav-link-item text-[11px] py-1.5 px-3 ${activeTab === 'create' ? 'active' : ''}`}
-          >
-            <PlusCircle className="w-3.5 h-3.5" />
-            Buat Kuis
-          </button>
-          <button
-            onClick={() => setActiveTab('quizzes')}
-            className={`nav-link-item text-[11px] py-1.5 px-3 ${activeTab === 'quizzes' ? 'active' : ''}`}
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            Kuis Saya
-          </button>
-          <button
-            onClick={() => setActiveTab('results')}
-            className={`nav-link-item text-[11px] py-1.5 px-3 ${activeTab === 'results' ? 'active' : ''}`}
-          >
-            <Trophy className="w-3.5 h-3.5" />
-            Rekap Nilai
-          </button>
-        </div>
-      )}
     </header>
   );
 }
