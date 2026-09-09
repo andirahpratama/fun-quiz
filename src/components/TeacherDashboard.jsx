@@ -144,7 +144,7 @@ export default function TeacherDashboard({
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6">
+    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6">
       
       {/* Tab 1: Create Quiz Form */}
       {activeTab === 'create' && (
@@ -152,8 +152,8 @@ export default function TeacherDashboard({
           
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-indigo-600" />
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <Sparkles className="w-7 h-7 text-[#059669]" />
                 Buat Game Kuis Baru
               </h2>
               <p className="text-xs text-slate-500 mt-1">Lengkapi parameter kuis sederhana untuk siswa SMP.</p>
@@ -163,19 +163,19 @@ export default function TeacherDashboard({
           <form onSubmit={handleCreateQuiz} className="space-y-6">
             
             {/* Step 1: Subject & Material Card */}
-            <div className="bright-panel p-6 sm:p-8">
-              <h3 className="text-xs font-black uppercase text-indigo-600 tracking-wider mb-4 flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-indigo-600" />
+            <div className="dashboard-card-clean">
+              <h3 className="text-xs font-black uppercase text-[#059669] tracking-wider mb-4 flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-[#059669]" />
                 1. MATA PELAJARAN & MATERI SOAL
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="form-group">
-                  <label className="form-label">Mata Pelajaran SMP</label>
+                <div className="form-group-clean">
+                  <label className="form-label-clean">Mata Pelajaran SMP</label>
                   <select
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="form-select text-sm font-bold py-3"
+                    className="form-select-clean font-bold"
                   >
                     {SUBJECTS.map((s) => (
                       <option key={s.id} value={s.id}>
@@ -185,30 +185,31 @@ export default function TeacherDashboard({
                   </select>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Materi Pokok Soal</label>
+                <div className="form-group-clean">
+                  <label className="form-label-clean">Materi Pokok Soal</label>
                   <input
                     type="text"
                     required
                     placeholder="Contoh: Sistem Pencernaan / Aljabar"
                     value={material}
                     onChange={(e) => setMaterial(e.target.value)}
-                    className="form-input text-sm py-3"
+                    className="form-input-clean"
+                    style={{ paddingLeft: '16px' }}
                   />
                 </div>
               </div>
             </div>
 
             {/* Step 2: Question Count & Timer Duration Card */}
-            <div className="bright-panel p-6 sm:p-8">
-              <h3 className="text-xs font-black uppercase text-indigo-600 tracking-wider mb-4 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-indigo-600" />
+            <div className="dashboard-card-clean">
+              <h3 className="text-xs font-black uppercase text-[#059669] tracking-wider mb-4 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#059669]" />
                 2. JUMLAH SOAL & DURASI WAKTU
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="form-group">
-                  <label className="form-label">Jumlah Soal (3 - 30 Soal)</label>
+                <div className="form-group-clean">
+                  <label className="form-label-clean">Jumlah Soal (3 - 30 Soal)</label>
                   <input
                     type="number"
                     min="3"
@@ -216,33 +217,34 @@ export default function TeacherDashboard({
                     required
                     value={questionCount}
                     onChange={(e) => setQuestionCount(Number(e.target.value))}
-                    className="form-input text-base font-black py-3 text-indigo-700"
+                    className="form-input-clean text-base font-black text-[#059669]"
+                    style={{ paddingLeft: '16px' }}
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Durasi Waktu Game</label>
+                <div className="form-group-clean">
+                  <label className="form-label-clean">Durasi Waktu Game</label>
                   
                   {/* Preset Pills */}
                   <div className="flex flex-wrap gap-2 mb-3">
                     <button
                       type="button"
                       onClick={() => setQuickDuration(5)}
-                      className={`preset-chip ${minutes === 5 && hours === 0 ? 'active' : ''}`}
+                      className={`preset-chip-clean ${minutes === 5 && hours === 0 ? 'active' : ''}`}
                     >
                       5 Menit
                     </button>
                     <button
                       type="button"
                       onClick={() => setQuickDuration(10)}
-                      className={`preset-chip ${minutes === 10 && hours === 0 ? 'active' : ''}`}
+                      className={`preset-chip-clean ${minutes === 10 && hours === 0 ? 'active' : ''}`}
                     >
                       10 Menit
                     </button>
                     <button
                       type="button"
                       onClick={() => setQuickDuration(15)}
-                      className={`preset-chip ${minutes === 15 && hours === 0 ? 'active' : ''}`}
+                      className={`preset-chip-clean ${minutes === 15 && hours === 0 ? 'active' : ''}`}
                     >
                       15 Menit
                     </button>
@@ -258,7 +260,8 @@ export default function TeacherDashboard({
                         max="5"
                         value={hours}
                         onChange={(e) => setHours(Number(e.target.value))}
-                        className="form-input text-center text-sm font-bold py-2"
+                        className="form-input-clean text-center text-sm font-bold"
+                        style={{ paddingLeft: '10px', paddingRight: '10px' }}
                       />
                     </div>
                     <div>
@@ -269,7 +272,8 @@ export default function TeacherDashboard({
                         max="59"
                         value={minutes}
                         onChange={(e) => setMinutes(Number(e.target.value))}
-                        className="form-input text-center text-sm font-bold py-2"
+                        className="form-input-clean text-center text-sm font-bold"
+                        style={{ paddingLeft: '10px', paddingRight: '10px' }}
                       />
                     </div>
                     <div>
@@ -280,7 +284,8 @@ export default function TeacherDashboard({
                         max="59"
                         value={seconds}
                         onChange={(e) => setSeconds(Number(e.target.value))}
-                        className="form-input text-center text-sm font-bold py-2"
+                        className="form-input-clean text-center text-sm font-bold"
+                        style={{ paddingLeft: '10px', paddingRight: '10px' }}
                       />
                     </div>
                   </div>
@@ -289,8 +294,8 @@ export default function TeacherDashboard({
             </div>
 
             {/* Step 3: Game Type Selection */}
-            <div className="bright-panel p-6 sm:p-8">
-              <h3 className="text-xs font-black uppercase text-indigo-600 tracking-wider mb-4 flex items-center gap-2">
+            <div className="dashboard-card-clean">
+              <h3 className="text-xs font-black uppercase text-[#059669] tracking-wider mb-4 flex items-center gap-2">
                 🎮 3. PILIH JENIS MINI-GAME
               </h3>
 
@@ -299,9 +304,9 @@ export default function TeacherDashboard({
                   <div
                     key={gt.id}
                     onClick={() => setGameType(gt.id)}
-                    className={`cursor-pointer p-4 rounded-xl border transition-all ${
+                    className={`cursor-pointer p-4 rounded-2xl border transition-all ${
                       gameType === gt.id
-                        ? 'bg-indigo-50 border-indigo-600 ring-2 ring-indigo-600/30'
+                        ? 'bg-emerald-50 border-[#059669] ring-2 ring-emerald-600/30'
                         : 'bg-white border-slate-200 hover:border-slate-300'
                     }`}
                   >
@@ -318,25 +323,25 @@ export default function TeacherDashboard({
             </div>
 
             {/* Optional Question Bank Preview Toggle */}
-            <div className="bright-panel p-4 sm:p-6">
+            <div className="dashboard-card-clean p-4 sm:p-6">
               <button
                 type="button"
                 onClick={() => setShowQuestionPreview(!showQuestionPreview)}
                 className="w-full flex items-center justify-between text-xs font-bold text-slate-700"
               >
                 <span className="flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-indigo-600" />
+                  <HelpCircle className="w-4 h-4 text-[#059669]" />
                   Pratinjau Bank Soal Otomatis ({questions.length} Soal)
                 </span>
-                <ChevronRight className={`w-4 h-4 text-indigo-600 transition-transform ${showQuestionPreview ? 'rotate-90' : ''}`} />
+                <ChevronRight className={`w-4 h-4 text-[#059669] transition-transform ${showQuestionPreview ? 'rotate-90' : ''}`} />
               </button>
 
               {showQuestionPreview && (
                 <div className="mt-4 pt-4 border-t border-slate-200 space-y-3 max-h-60 overflow-y-auto pr-2">
                   {questions.map((q, idx) => (
-                    <div key={q.id} className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+                    <div key={q.id} className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-indigo-600">Soal #{idx + 1}</span>
+                        <span className="font-bold text-[#059669]">Soal #{idx + 1}</span>
                         <span className="text-[10px] text-slate-600 bg-slate-200 px-2 py-0.5 rounded font-bold">
                           Jawaban: ({String.fromCharCode(65 + q.correctAnswer)})
                         </span>
@@ -354,10 +359,10 @@ export default function TeacherDashboard({
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full btn-primary justify-center py-4 text-base font-bold tracking-wide shadow-lg"
+              className="btn-emerald py-4 text-base font-bold"
             >
               <Share2 className="w-5 h-5" />
-              GENERATE LINK KUIS SEKARANG
+              Generate Link Kuis Sekarang
             </button>
 
           </form>
@@ -374,7 +379,7 @@ export default function TeacherDashboard({
             </div>
             <button
               onClick={() => setActiveTab('create')}
-              className="btn-primary text-xs py-2 px-4"
+              className="btn-emerald text-xs py-2 px-4 w-auto"
             >
               <PlusCircle className="w-4 h-4" />
               Buat Kuis Baru
@@ -382,7 +387,7 @@ export default function TeacherDashboard({
           </div>
 
           {myQuizzes.length === 0 ? (
-            <div className="bright-panel p-12 text-center text-slate-400">
+            <div className="dashboard-card-clean p-12 text-center text-slate-400">
               <BookOpen className="w-12 h-12 mx-auto mb-3 text-slate-400" />
               <p className="font-bold text-sm text-slate-700">Belum ada kuis yang dibuat.</p>
               <p className="text-xs mt-1 text-slate-500">Klik tombol "Buat Kuis Baru" untuk membuat game pertama Anda.</p>
@@ -394,17 +399,17 @@ export default function TeacherDashboard({
                 const shareUrl = getQuizShareUrl(q);
 
                 return (
-                  <div key={q.id} className="bright-card p-6 flex flex-col justify-between">
+                  <div key={q.id} className="dashboard-card-clean p-6 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-2xl">{gameInfo.icon}</span>
-                        <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-50 text-[#059669] border border-emerald-200">
                           {q.share_code || 'CODE'}
                         </span>
                       </div>
 
                       <h3 className="font-black text-lg text-slate-900 mb-1">{q.subject}</h3>
-                      <p className="text-xs font-bold text-indigo-600 mb-3">Materi: {q.material}</p>
+                      <p className="text-xs font-bold text-[#059669] mb-3">Materi: {q.material}</p>
 
                       <div className="space-y-1 text-xs text-slate-600 mb-4">
                         <p>• Jumlah Soal: <strong className="text-slate-800">{q.question_count} Soal</strong></p>
@@ -415,7 +420,7 @@ export default function TeacherDashboard({
                     <div className="pt-4 border-t border-slate-200 space-y-2">
                       <button
                         onClick={() => handleOpenGameInNewTab(q)}
-                        className="w-full btn-primary justify-center py-2 text-xs font-bold"
+                        className="btn-emerald text-xs py-2 justify-center font-bold"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         Uji Game di Tab Baru ↗
@@ -424,7 +429,7 @@ export default function TeacherDashboard({
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleCopyLink(shareUrl)}
-                          className="flex-1 btn-secondary justify-center py-2 text-xs font-semibold"
+                          className="flex-1 btn-secondary-clean justify-center py-2 text-xs font-semibold"
                         >
                           <Copy className="w-3.5 h-3.5" />
                           Salin Link
@@ -463,7 +468,7 @@ export default function TeacherDashboard({
               <select
                 value={filterQuizId}
                 onChange={(e) => setFilterQuizId(e.target.value)}
-                className="form-select py-2 text-xs font-semibold"
+                className="form-select-clean py-2 text-xs font-semibold"
               >
                 <option value="ALL">Semua Kuis ({myQuizzes.length})</option>
                 {myQuizzes.map(q => (
@@ -475,7 +480,7 @@ export default function TeacherDashboard({
 
               <button
                 onClick={handleExportPDF}
-                className="btn-primary text-xs py-2.5 px-4 font-bold shrink-0"
+                className="btn-emerald text-xs py-2.5 px-4 font-bold shrink-0 w-auto"
               >
                 <Download className="w-4 h-4" />
                 Unduh PDF Ranking
@@ -484,7 +489,7 @@ export default function TeacherDashboard({
           </div>
 
           {/* Results Table */}
-          <div className="bright-panel overflow-hidden">
+          <div className="dashboard-card-clean overflow-hidden p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-slate-700">
                 <thead className="bg-slate-50 text-xs font-bold uppercase text-slate-600 border-b border-slate-200">
@@ -524,7 +529,7 @@ export default function TeacherDashboard({
                           <td className="py-4 px-6 font-bold text-slate-900">{res.student_name}</td>
                           <td className="py-4 px-6 font-medium text-slate-500">{res.student_class || '-'}</td>
                           <td className="py-4 px-6">
-                            <p className="font-semibold text-indigo-700">{res.subject}</p>
+                            <p className="font-semibold text-[#059669]">{res.subject}</p>
                             <p className="text-xs text-slate-500">{res.material}</p>
                           </td>
                           <td className="py-4 px-6 font-bold">
@@ -551,9 +556,9 @@ export default function TeacherDashboard({
       {/* Share Link Modal Popup */}
       {createdQuizModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-          <div className="relative w-full max-w-md bright-panel p-6 text-center shadow-2xl">
+          <div className="relative w-full max-w-md dashboard-card-clean p-6 text-center shadow-2xl">
             
-            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 mx-auto mb-3 flex items-center justify-center border border-emerald-200">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 text-[#059669] mx-auto mb-3 flex items-center justify-center border border-emerald-200">
               <CheckCircle2 className="w-8 h-8" />
             </div>
 
@@ -563,7 +568,7 @@ export default function TeacherDashboard({
             </p>
 
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 mb-5 text-left">
-              <span className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider block mb-1">
+              <span className="text-[10px] text-[#059669] font-bold uppercase tracking-wider block mb-1">
                 Link Aplikasi Siswa:
               </span>
               <div className="flex items-center gap-2">
@@ -571,13 +576,14 @@ export default function TeacherDashboard({
                   type="text"
                   readOnly
                   value={getQuizShareUrl(createdQuizModal)}
-                  className="form-input text-xs font-mono bg-white text-slate-800 py-2"
+                  className="form-input-clean text-xs font-mono bg-white text-slate-800 py-2"
+                  style={{ paddingLeft: '12px' }}
                 />
                 <button
                   onClick={() => handleCopyLink(getQuizShareUrl(createdQuizModal))}
-                  className="btn-secondary py-2 px-3 text-xs shrink-0"
+                  className="btn-secondary-clean py-2 px-3 text-xs shrink-0"
                 >
-                  {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                  {copiedLink ? <Check className="w-4 h-4 text-[#059669]" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
             </div>
@@ -585,19 +591,18 @@ export default function TeacherDashboard({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCreatedQuizModal(null)}
-                className="flex-1 btn-secondary justify-center py-2.5 text-xs font-semibold"
+                className="flex-1 btn-secondary-clean justify-center py-2.5 text-xs font-semibold"
               >
                 Tutup
               </button>
               
-              {/* Opens game in NEW TAB! */}
               <button
                 onClick={() => {
                   const q = createdQuizModal;
                   setCreatedQuizModal(null);
                   handleOpenGameInNewTab(q);
                 }}
-                className="flex-1 btn-primary justify-center py-2.5 text-xs font-bold"
+                className="flex-1 btn-emerald justify-center py-2.5 text-xs font-bold"
               >
                 Uji di Tab Baru ↗
               </button>
