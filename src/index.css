@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;700;800;900&display=swap');
 
 :root {
-  --bg-page: #0f2e27;
+  --bg-page: #f0fdf4;
+  --bg-header: #071e19;
   --bg-card: #ffffff;
   --bg-input: #f8fafc;
   --emerald-primary: #059669;
@@ -10,10 +11,9 @@
   --text-dark: #0f172a;
   --text-muted: #64748b;
   --border-light: #e2e8f0;
-  --border-focus: #059669;
-  --radius-card: 28px;
-  --radius-button: 14px;
-  --radius-input: 14px;
+  --radius-card: 24px;
+  --radius-button: 12px;
+  --radius-input: 12px;
   --radius-pill: 9999px;
 }
 
@@ -30,33 +30,84 @@ body {
   color: var(--text-dark);
   min-height: 100vh;
   overflow-x: hidden;
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.2) 0%, transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(5, 150, 105, 0.15) 0%, transparent 50%);
-  background-attachment: fixed;
 }
 
-/* Card Container (Neraca UMKM Style) */
-.auth-card-clean {
-  background: var(--bg-card);
+/* Top Header Bar (Neraca UMKM Dashboard Style) */
+.navy-header {
+  background: var(--bg-header);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.nav-link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #94a3b8;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-link-item:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-link-item.active {
+  background: #059669;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
+}
+
+/* Welcome Banner Card */
+.welcome-banner {
+  background: linear-gradient(135deg, #053b2e 0%, #0a5241 100%);
   border-radius: var(--radius-card);
-  padding: 2.5rem 2rem;
-  width: 100%;
-  max-width: 440px;
-  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  margin: 0 auto;
+  padding: 2rem 2.5rem;
+  color: #ffffff;
+  box-shadow: 0 15px 35px -5px rgba(5, 59, 46, 0.3);
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
 }
 
+.welcome-banner::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.banner-stat-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  min-width: 170px;
+}
+
+/* Card Container */
 .dashboard-card-clean {
   background: var(--bg-card);
   border-radius: var(--radius-card);
-  padding: 2.5rem;
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.25);
+  padding: 2.25rem;
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
   border: 1px solid var(--border-light);
+  margin-bottom: 1.5rem;
 }
 
-/* Input Fields with Inner Icons */
+/* Form Controls & Dropdown Select */
 .form-group-clean {
   display: flex;
   flex-direction: column;
@@ -73,26 +124,9 @@ body {
   letter-spacing: 0.08em;
 }
 
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
+.form-input-clean, .form-select-clean {
   width: 100%;
-}
-
-.input-icon {
-  position: absolute;
-  left: 16px;
-  color: #94a3b8;
-  width: 18px;
-  height: 18px;
-  pointer-events: none;
-  transition: color 0.2s ease;
-}
-
-.form-input-clean {
-  width: 100%;
-  padding: 13px 16px 13px 46px;
+  padding: 12px 16px;
   background: var(--bg-input);
   border: 1.5px solid var(--border-light);
   border-radius: var(--radius-input);
@@ -101,41 +135,19 @@ body {
   font-weight: 600;
   outline: none;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
-.form-input-clean::placeholder {
-  color: #94a3b8;
-  font-weight: 400;
-}
-
-.form-input-clean:focus {
+.form-input-clean:focus, .form-select-clean:focus {
   background: #ffffff;
   border-color: var(--emerald-primary);
   box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.15);
 }
 
-.form-input-clean:focus + .input-icon,
-.input-wrapper:focus-within .input-icon {
-  color: var(--emerald-primary);
-}
-
-.form-select-clean {
-  width: 100%;
-  padding: 13px 16px;
-  background: var(--bg-input);
-  border: 1.5px solid var(--border-light);
-  border-radius: var(--radius-input);
-  color: var(--text-dark);
-  font-size: 0.95rem;
-  font-weight: 600;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.form-select-clean:focus {
+.form-select-clean option {
   background: #ffffff;
-  border-color: var(--emerald-primary);
-  box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.15);
+  color: #0f172a;
+  padding: 10px;
 }
 
 /* Primary Action Buttons */
@@ -184,29 +196,6 @@ body {
   color: #0f172a !important;
 }
 
-/* Navigation Pills */
-.nav-pill {
-  padding: 8px 18px;
-  border-radius: var(--radius-pill);
-  font-size: 0.85rem;
-  font-weight: 700;
-  background: #f1f5f9;
-  color: #475569;
-  border: 1px solid #e2e8f0;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.nav-pill.active {
-  background: #059669;
-  color: #ffffff;
-  border-color: #059669;
-  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
-}
-
 .preset-chip-clean {
   padding: 8px 16px;
   border-radius: 10px;
@@ -248,7 +237,7 @@ body {
   margin: 0 auto;
   border-radius: var(--radius-card);
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
   border: 2px solid #cbd5e1;
 }
 

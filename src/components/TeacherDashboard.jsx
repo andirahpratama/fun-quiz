@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   PlusCircle, BookOpen, Trophy, Copy, Check, Share2, Play, Trash2, 
-  Download, Clock, Layers, Sparkles, HelpCircle, ChevronRight, CheckCircle2, ExternalLink 
+  Download, Clock, Layers, Sparkles, HelpCircle, ChevronRight, CheckCircle2, ExternalLink, Gamepad2 
 } from 'lucide-react';
 import { SUBJECTS, GAME_TYPES, generateQuestions } from '../data/questionBank';
 import { api } from '../lib/supabase';
@@ -35,6 +35,14 @@ export default function TeacherDashboard({
   const [teacherResults, setTeacherResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filterQuizId, setFilterQuizId] = useState('ALL');
+
+  // Format Current Date
+  const currentDateStr = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
 
   // Load questions when subject or material changes
   useEffect(() => {
@@ -113,7 +121,6 @@ export default function TeacherDashboard({
     setTimeout(() => setCopiedLink(false), 2500);
   };
 
-  // Open Quiz Game in NEW TAB!
   const handleOpenGameInNewTab = (quiz) => {
     const url = getQuizShareUrl(quiz);
     window.open(url, '_blank');
@@ -144,22 +151,48 @@ export default function TeacherDashboard({
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6">
+    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6">
       
+      {/* 1. Welcome Banner Card (Neraca UMKM Dashboard Style) */}
+      <div className="welcome-banner flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+          <p className="text-xs font-semibold text-emerald-200">
+            Selamat Datang 🌤️,
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-yellow-400 mt-1">
+            {user?.name || 'Guru SMP'}!
+          </h2>
+          <p className="text-xs text-emerald-100 font-medium mt-2">
+            {currentDateStr}
+          </p>
+        </div>
+
+        {/* Right Metric Summary Cards */}
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          <div className="banner-stat-card flex-1 md:flex-initial">
+            <span className="text-[10px] uppercase font-black tracking-wider text-emerald-200 block">
+              TOTAL KUIS DIBUAT
+            </span>
+            <div className="text-2xl font-black text-white mt-1">
+              {myQuizzes.length} <span className="text-xs font-normal opacity-80">Kuis</span>
+            </div>
+          </div>
+
+          <div className="banner-stat-card flex-1 md:flex-initial">
+            <span className="text-[10px] uppercase font-black tracking-wider text-emerald-200 block">
+              SISWA MENGERJAKAN
+            </span>
+            <div className="text-2xl font-black text-[#10b981] mt-1">
+              {teacherResults.length} <span className="text-xs font-normal opacity-80">Siswa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Tab 1: Create Quiz Form */}
       {activeTab === 'create' && (
         <div className="animate-fadeIn">
           
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                <Sparkles className="w-7 h-7 text-[#059669]" />
-                Buat Game Kuis Baru
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">Lengkapi parameter kuis sederhana untuk siswa SMP.</p>
-            </div>
-          </div>
-
           <form onSubmit={handleCreateQuiz} className="space-y-6">
             
             {/* Step 1: Subject & Material Card */}
@@ -293,32 +326,26 @@ export default function TeacherDashboard({
               </div>
             </div>
 
-            {/* Step 3: Game Type Selection */}
+            {/* Step 3: Game Type Selection via DROPDOWN MENU */}
             <div className="dashboard-card-clean">
               <h3 className="text-xs font-black uppercase text-[#059669] tracking-wider mb-4 flex items-center gap-2">
-                🎮 3. PILIH JENIS MINI-GAME
+                <Gamepad2 className="w-4 h-4 text-[#059669]" />
+                3. PILIH JENIS MINI-GAME (DROPDOWN)
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {GAME_TYPES.map((gt) => (
-                  <div
-                    key={gt.id}
-                    onClick={() => setGameType(gt.id)}
-                    className={`cursor-pointer p-4 rounded-2xl border transition-all ${
-                      gameType === gt.id
-                        ? 'bg-emerald-50 border-[#059669] ring-2 ring-emerald-600/30'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{gt.icon}</span>
-                      <div>
-                        <h4 className="font-extrabold text-slate-900 text-sm">{gt.name}</h4>
-                        <p className="text-xs text-slate-500 mt-0.5">{gt.desc}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="form-group-clean mb-0">
+                <label className="form-label-clean">PILIH VARIASI GAME YANG DIINGINKAN</label>
+                <select
+                  value={gameType}
+                  onChange={(e) => setGameType(e.target.value)}
+                  className="form-select-clean text-base font-bold py-3.5"
+                >
+                  {GAME_TYPES.map((gt) => (
+                    <option key={gt.id} value={gt.id}>
+                      {gt.icon} {gt.name} — {gt.desc}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -399,7 +426,7 @@ export default function TeacherDashboard({
                 const shareUrl = getQuizShareUrl(q);
 
                 return (
-                  <div key={q.id} className="dashboard-card-clean p-6 flex flex-col justify-between">
+                  <div key={q.id} className="dashboard-card-clean p-6 flex flex-col justify-between mb-0">
                     <div>
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-2xl">{gameInfo.icon}</span>
@@ -414,6 +441,7 @@ export default function TeacherDashboard({
                       <div className="space-y-1 text-xs text-slate-600 mb-4">
                         <p>• Jumlah Soal: <strong className="text-slate-800">{q.question_count} Soal</strong></p>
                         <p>• Durasi: <strong className="text-slate-800">{Math.floor(q.duration_seconds / 60)} Menit</strong></p>
+                        <p>• Game: <strong className="text-slate-800">{gameInfo.name}</strong></p>
                       </div>
                     </div>
 
@@ -489,7 +517,7 @@ export default function TeacherDashboard({
           </div>
 
           {/* Results Table */}
-          <div className="dashboard-card-clean overflow-hidden p-0">
+          <div className="dashboard-card-clean overflow-hidden p-0 mb-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-slate-700">
                 <thead className="bg-slate-50 text-xs font-bold uppercase text-slate-600 border-b border-slate-200">
@@ -556,7 +584,7 @@ export default function TeacherDashboard({
       {/* Share Link Modal Popup */}
       {createdQuizModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-          <div className="relative w-full max-w-md dashboard-card-clean p-6 text-center shadow-2xl">
+          <div className="relative w-full max-w-md dashboard-card-clean p-6 text-center shadow-2xl mb-0">
             
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-[#059669] mx-auto mb-3 flex items-center justify-center border border-emerald-200">
               <CheckCircle2 className="w-8 h-8" />
