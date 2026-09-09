@@ -47,7 +47,7 @@ export default function TeacherDashboard({
   // Load questions when subject or material changes
   useEffect(() => {
     const generated = generateQuestions(subject, material, questionCount);
-    setQuestions(generated);
+    setQuestions(Array.isArray(generated) ? generated : []);
   }, [subject, material, questionCount]);
 
   // Load User Data
@@ -62,10 +62,12 @@ export default function TeacherDashboard({
     try {
       const quizzes = await api.getUserQuizzes(user.id);
       const results = await api.getTeacherResults(user.id);
-      setMyQuizzes(quizzes);
-      setTeacherResults(results);
+      setMyQuizzes(Array.isArray(quizzes) ? quizzes : []);
+      setTeacherResults(Array.isArray(results) ? results : []);
     } catch (e) {
       console.error('Error loading teacher data:', e);
+      setMyQuizzes([]);
+      setTeacherResults([]);
     } finally {
       setLoading(false);
     }
@@ -93,13 +95,14 @@ export default function TeacherDashboard({
     try {
       const quizPayload = {
         user_id: user.id,
-        teacher_name: user.name,
+        teacher_name: user.name || 'Guru SMP',
+        teacher_email: user.email || '',
         subject,
         material,
         question_count: Number(questionCount),
         duration_seconds: durationSeconds,
         game_type: gameType,
-        questions,
+        questions: questions || [],
       };
 
       const newQuiz = await api.createQuiz(quizPayload);
@@ -111,6 +114,7 @@ export default function TeacherDashboard({
   };
 
   const getQuizShareUrl = (quiz) => {
+    if (!quiz) return '';
     const code = quiz.share_code || quiz.id;
     return `${window.location.origin}${window.location.pathname}?quiz=${code}`;
   };
@@ -124,18 +128,22 @@ export default function TeacherDashboard({
   const handleDeleteQuiz = async (quizId) => {
     if (!window.confirm('Apakah Anda yakin ingin menghapus kuis ini?')) return;
     try {
-      await api.deleteQuiz(quizId);
+      await api.deleteQuiz(quizId, user?.id);
       await loadUserData();
     } catch (e) {
       alert('Gagal menghapus kuis');
     }
   };
 
+  // Defensive Array Wrappers
+  const safeQuizzes = Array.isArray(myQuizzes) ? myQuizzes : [];
+  const safeResults = Array.isArray(teacherResults) ? teacherResults : [];
+
   // Stats calculation
-  const totalQuizzes = myQuizzes.length;
-  const totalSubmissions = teacherResults.length;
+  const totalQuizzes = safeQuizzes.length;
+  const totalSubmissions = safeResults.length;
   const avgScore = totalSubmissions > 0
-    ? Math.round(teacherResults.reduce((acc, r) => acc + (r.score || 0), 0) / totalSubmissions)
+    ? Math.round(safeResults.reduce((acc, r) => acc + (r?.score || 0), 0) / totalSubmissions)
     : 0;
 
   const currentSubjectData = SUBJECTS.find(s => s.id === subject) || SUBJECTS[0];
@@ -244,7 +252,7 @@ export default function TeacherDashboard({
                     onChange={(e) => setMaterial(e.target.value)}
                     className="form-select-cyber pl-4 h-12"
                   >
-                    {currentSubjectData.materials.map((m) => (
+                    {(currentSubjectData.materials || []).map((m) => (
                       <option key={m} value={m}>
                         📚 {m}
                       </option>
@@ -419,7 +427,7 @@ export default function TeacherDashboard({
             <div>
               <h2 className="text-2xl font-black text-white flex items-center gap-2">
                 <BookOpen className="w-6 h-6 text-cyan-400" />
-                Kuis Saya ({myQuizzes.length})
+                Kuis Saya ({safeQuizzes.length})
               </h2>
               <p className="text-xs text-slate-400">
                 Daftar kuis yang telah Anda buat. Salin link untuk dibagikan ke kelas siswa Anda.
@@ -439,7 +447,7 @@ export default function TeacherDashboard({
             <div className="glass-card p-12 text-center text-slate-400 font-bold">
               Memuat daftar kuis...
             </div>
-          ) : myQuizzes.length === 0 ? (
+          ) : safeQuizzes.length === 0 ? (
             <div className="glass-card p-12 text-center space-y-3">
               <div className="w-16 h-16 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center mx-auto text-2xl">
                 📚
@@ -451,12 +459,13 @@ export default function TeacherDashboard({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {myQuizzes.map((quiz) => {
+              {safeQuizzes.map((quiz) => {
+                if (!quiz) return null;
                 const shareUrl = getQuizShareUrl(quiz);
                 const gameIcon = quiz.game_type === 'fishing' ? '🎣' : quiz.game_type === 'balloon' ? '🎯' : quiz.game_type === 'catch_ball' ? '🏀' : '⚔️';
 
                 return (
-                  <div key={quiz.id} className="glass-card p-6 flex flex-col justify-between space-y-4">
+                  <div key={quiz.id || Math.random()} className="glass-card p-6 flex flex-col justify-between space-y-4">
                     <div>
                       <div className="flex items-center justify-between mb-3">
                         <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -464,7 +473,7 @@ export default function TeacherDashboard({
                         </span>
                         <span className="text-xs font-extrabold text-slate-400 flex items-center gap-1">
                           <Clock className="w-3.5 h-3.5 text-cyan-400" />
-                          {Math.round(quiz.duration_seconds / 60)} Menit
+                          {Math.round((quiz.duration_seconds || 300) / 60)} Menit
                         </span>
                       </div>
 
@@ -474,7 +483,7 @@ export default function TeacherDashboard({
 
                       <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
                         <span>{gameIcon}</span>
-                        <span>Game: <strong className="text-slate-200 uppercase">{quiz.game_type.replace('_', ' ')}</strong></span>
+                        <span>Game: <strong className="text-slate-200 uppercase">{(quiz.game_type || 'fruit_ninja').replace('_', ' ')}</strong></span>
                         <span>&bull;</span>
                         <span>{quiz.question_count || quiz.questions?.length || 5} Soal</span>
                       </p>
@@ -524,16 +533,16 @@ export default function TeacherDashboard({
             <div>
               <h2 className="text-2xl font-black text-white flex items-center gap-2">
                 <Trophy className="w-6 h-6 text-amber-400" />
-                Rekapitulasi Nilai Siswa ({teacherResults.length})
+                Rekapitulasi Nilai Siswa ({safeResults.length})
               </h2>
               <p className="text-xs text-slate-400">
                 Data nilai pengerjaan kuis siswa secara otomatis tersimpan & terkalibrasi.
               </p>
             </div>
 
-            {teacherResults.length > 0 && (
+            {safeResults.length > 0 && (
               <button
-                onClick={() => exportTeacherResultsPDF(teacherResults, user?.name)}
+                onClick={() => exportTeacherResultsPDF(safeResults, user?.name)}
                 className="btn-cyan-glow text-xs py-2.5 px-4"
               >
                 <Download className="w-4 h-4" />
@@ -546,7 +555,7 @@ export default function TeacherDashboard({
             <div className="glass-card p-12 text-center text-slate-400 font-bold">
               Memuat data rekap nilai...
             </div>
-          ) : teacherResults.length === 0 ? (
+          ) : safeResults.length === 0 ? (
             <div className="glass-card p-12 text-center space-y-3">
               <div className="w-16 h-16 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center mx-auto text-2xl">
                 🏆
@@ -572,10 +581,11 @@ export default function TeacherDashboard({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60 text-xs font-semibold text-slate-200">
-                    {teacherResults.map((res, idx) => {
+                    {safeResults.map((res, idx) => {
+                      if (!res) return null;
                       const isPassed = (res.score || 0) >= 70;
                       return (
-                        <tr key={idx} className="hover:bg-slate-800/40 transition">
+                        <tr key={res.id || idx} className="hover:bg-slate-800/40 transition">
                           <td className="p-4 font-extrabold text-white">
                             {res.student_name}
                           </td>
